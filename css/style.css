@@ -1,0 +1,18 @@
+* {
+    /* include padding and border in total width/height calculations by default */
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* GLOBAL COLOR VARIABLES */
+:root {
+    --cr-text-primary: rgb(2, 22, 7);
+    --cr-bg-primary: rgb(255, 255, 255);
+}
+
+:root {
+    color: var(--cr-text-primary);
+    background-color: var(--cr-bg-primary);
+}
