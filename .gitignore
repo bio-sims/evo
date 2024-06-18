@@ -1,0 +1,5 @@
+# jsdoc generated files
+out/
+
+# vscode settings
+.vscode/
