@@ -66,6 +66,23 @@ export class Hare {
   }
 
   /**
+   * Determine what the hare's whiteness will be at a given week
+   * @param {number} week - the week to determine the whiteness for
+   * @returns {number} the whiteness of the hare at the given week
+   */
+  getProjectedWhiteness(week) {
+    const { brownStart, brownRate, whiteStart, whiteRate } = this.getTransitionPhenotype();
+    let whiteness = this.whiteness;
+    const yearWeek = week % 52;
+    if (yearWeek >= whiteStart) {
+      whiteness = Math.min(1, whiteness + whiteRate * (yearWeek - whiteStart));
+    } else if (yearWeek >= brownStart) {
+      whiteness = Math.max(0, whiteness - brownRate * (yearWeek - brownStart));
+    }
+    return whiteness;
+  }
+
+  /**
    * Run a survival pass on the hare
    * @param {number} baseSurvivalRate - the base survival rate of the hare
    * @param {number} mismatchPenalty - the penalty for mismatched fur
@@ -76,11 +93,12 @@ export class Hare {
   doSurvivalPass(baseSurvivalRate, mismatchPenalty, snowCoverage, week) {
     if (!this.alive) return false; // if the hare is already dead, no need to simulate as it would always be false
     const { brownStart, brownRate, whiteStart, whiteRate } = this.getTransitionPhenotype();
-    // update the fur color based on the week
-    if (week >= whiteStart) {
-      this.whiteness = Math.min(1, this.whiteness + whiteRate);
-    } else if (week >= brownStart) {
+    // update the fur color based on the week year
+    const yearWeek = week % 52;
+    if (yearWeek >= brownStart && yearWeek < whiteStart) {
       this.whiteness = Math.max(0, this.whiteness - brownRate);
+    } else {
+      this.whiteness = Math.min(1, this.whiteness + whiteRate);
     }
 
     // calculate the survival rate
