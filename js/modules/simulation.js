@@ -130,6 +130,10 @@ export class Simulation {
         this.week++;
     }
 
+    getPossibleCoatAlleles() {
+        return this.availableAlleles.filter((allele) => allele.type === "coat");
+    }
+
     /**
      * Calculate the relative frequency of each coat allele in the population
      */
@@ -137,15 +141,20 @@ export class Simulation {
         const popAlleles = this.hares.flatMap((hare) => hare.alleles);
         const coatAlleles = popAlleles.filter((allele) => allele.type === "coat");
 
-        // TODO: consider keeping the objects intact instead of stringifying them
-        const alleleFrequency = coatAlleles.reduce((acc, allele) => {
-            const key = JSON.stringify(allele);
-            acc[key] = (acc[key] || 0) + 1;
-            return acc;
-        }, {});
+        // make a json object with all the possible coat alleles
+        const alleleFrequency = {};
+        for (const allele of this.getPossibleCoatAlleles()) {
+            alleleFrequency[allele.id] = 0;
+        }
 
-        for (const key in alleleFrequency) {
-            alleleFrequency[key] /= coatAlleles.length;
+        // count the number of each allele in the population
+        for (const allele of coatAlleles) {
+            alleleFrequency[allele.id]++;
+        }
+
+        // divide by the total number of alleles to get the relative frequency
+        for (const allele of this.getPossibleCoatAlleles()) {
+            alleleFrequency[allele.id] /= coatAlleles.length;
         }
 
         return alleleFrequency;
