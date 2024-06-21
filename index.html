@@ -25,7 +25,6 @@
                 <h1>Preset Scenarios</h1>
                 <div class="buttons" id="preset-container"></div>
             </section>
-            <!-- Config for selection?, startweek num, carrying capacity num, base survival rate, mismatch penalty -->
             <section class="card card--side" id="preset-card">
                 <h1>Configuration</h1>
                 <form id="config-form">
@@ -42,6 +41,14 @@
                         <label for="mismatch-penalty">Mismatch Penalty</label>
                         <input type="range" id="mismatch-penalty" name="mismatch-penalty" min="0" max="1" step="0.01" value="0.5" oninput="this.nextElementSibling.value = this.value">
                         <output for="mismatch-penalty" id="mismatch-penalty-output">0.5</output>
+                    </div>
+                    <div class="input-group">
+                        <label for="climate-function">Climate Function</label>
+                        <select id="climate-function" name="climate-function"></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="generation-function">Generation Function</label>
+                        <select id="generation-function" name="generation-function"></select>
                     </div>
                     <div class="input-group">
                         <label for="start-week">Start Week</label>

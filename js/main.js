@@ -12,12 +12,14 @@ import { simulationConfig } from '../sim.config.js';
 let scenarios = simulationConfig.scenarios;
 let selectedScenarioIndex = 0;
 let currentConfig = scenarios[selectedScenarioIndex].options;
+const climateFunctions = [...new Set(scenarios.map((scenario) => scenario.options.calculateSnowCoverage))];
+const generationFunctions = [...new Set(scenarios.map((scenario) => scenario.options.shouldGenerateNewPopulation))];
 
 let alleleLineChart = null;
 
 /**
  * @type {Simulation|null}
- */
+*/
 let simulation = null;
 
 function getColorHue(index) {
@@ -35,7 +37,8 @@ function graphSetup() {
         datasets: Object.keys(initialFrequency).map((alleleId, i) => {
             const allele = simulation.availableAlleles.find((allele) => allele.id === parseInt(alleleId));
             return {
-                label: `Allele ${alleleId}`,
+                id: alleleId,
+                label: `${allele.name}`,
                 data: [initialFrequency[alleleId]],
                 borderColor: `hsla(${getColorHue(i)}, 100%, 50%, 1)`,
                 backgroundColor: `hsla(${getColorHue(i)}, 100%, 50%, 0.5)`,
@@ -87,8 +90,7 @@ function updateGraphData(refresh = false) {
     if (!simulation) return;
     const currentFrequency = simulation.getCoatAlleleFrequency();
     for (const dataset of alleleLineChart.data.datasets) {
-        const alleleId = dataset.label.match(/(\d+)/)[1];
-        dataset.data.push(currentFrequency[alleleId]);
+        dataset.data.push(currentFrequency[dataset.id]);
     }
     // if the next week causes the chart to exceed the x-axis, add a new label
     if (alleleLineChart.data.labels.length < simulation.week + 1) {
@@ -128,6 +130,11 @@ function updateScenario() {
     // similarly, determine if the mismatch penalty input should be disabled
     form.elements['mismatch-penalty'].disabled = !currentConfig.selection;
 
+    // set the climate and generation functions, matching by name
+    const climateSelect = form.elements['climate-function'];
+    const generationSelect = form.elements['generation-function'];
+    climateSelect.value = climateFunctions.findIndex((fn) => fn.name === currentConfig.calculateSnowCoverage.name);
+    generationSelect.value = generationFunctions.findIndex((fn) => fn.name === currentConfig.shouldGenerateNewPopulation.name);
 
     replaceSimulation()
 }
@@ -227,6 +234,24 @@ function main() {
     form.elements['selection'].addEventListener('change', (event) => {
         form.elements['mismatch-penalty'].disabled = !event.target.checked;
     });
+
+    // get a list of all unique climate and generation functions from the scenarios, eventually this will be pre-configured
+    const climateSelect = form.elements['climate-function'];
+    const generationSelect = form.elements['generation-function'];
+
+    for (let i = 0; i < climateFunctions.length; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = climateFunctions[i].name;
+        climateSelect.appendChild(option);
+    }
+
+    for (let i = 0; i < generationFunctions.length; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = generationFunctions[i].name;
+        generationSelect.appendChild(option);
+    }
 }
 
 main();
