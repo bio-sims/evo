@@ -18,24 +18,30 @@
             </li>
         </ul>
     </nav>
-    <main class="grid">
-        <!-- main card -->
-        <section class="card card--main">
-            <canvas id="allele-line-chart"></canvas>
-        </section>
+    <main class="card-container">
         <!-- side cards -->
-        <section class="card card--side">
-            <h1>Preset Scenarios</h1>
-            <div class="buttons" id="preset-container"></div>
-        </section>
-        <section class="card card--side">
-            <h1>Controls</h1>
-            <div class="buttons">
-                <button id="advance-week">Advance Week</button>
-                <button id="toggle-stack">Toggle Stack</button>
-                <button id="advance-10-years">Advance 10 Years</button>
-            </div>
-        </section>
+        <div class="card-panel card-panel--side">
+            <section class="card card--side" id="preset-card">
+                <h1>Preset Scenarios</h1>
+                <div class="buttons" id="preset-container"></div>
+            </section>
+            <section class="card card--side" id="preset-card">
+                <h1>Configuration</h1>
+            </section>
+        </div>
+        <!-- main card -->
+        <div class="card-panel card-panel--main">
+            <section class="card">
+                <canvas id="allele-line-chart"></canvas>
+            </section>
+            <section class="card">
+                <div class="buttons">
+                    <button id="advance-week">Advance Week</button>
+                    <button id="advance-10-years">Advance 10 Years</button>
+                    <button id="toggle-stack">Toggle Stack</button>
+                </div>
+            </section>
+        </div>
     </main>
 </body>
 </html>
