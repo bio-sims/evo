@@ -105,11 +105,31 @@ function updateGraphData(refresh = false) {
     }
 }
 
-function updateScenario() {
-    currentConfig = scenarios[selectedScenarioIndex].options;
+function replaceSimulation() {
     simulation = new Simulation(currentConfig);
     window.simulation = simulation; // temp
     graphSetup();
+}
+
+function updateScenario() {
+    currentConfig = scenarios[selectedScenarioIndex].options;
+    // set all form values to the current scenario
+    const form = document.getElementById('config-form');
+    form.elements['carrying-capacity'].value = currentConfig.carryingCapacity;
+    form.elements['base-survival-rate'].value = currentConfig.baseSurvivalRate;
+    form.elements['mismatch-penalty'].value = currentConfig.mismatchPenalty;
+    form.elements['selection'].checked = currentConfig.selection;
+    form.elements['start-week'].value = currentConfig.startWeek;
+
+    // set initial values for the output fields, will be properly updated on input change
+    form.elements['base-survival-rate-output'].value = currentConfig.baseSurvivalRate;
+    form.elements['mismatch-penalty-output'].value = currentConfig.mismatchPenalty;
+
+    // similarly, determine if the mismatch penalty input should be disabled
+    form.elements['mismatch-penalty'].disabled = !currentConfig.selection;
+
+
+    replaceSimulation()
 }
 
 function main() {
@@ -145,7 +165,7 @@ function main() {
         presetsContainer.appendChild(presetClone);
     }
 
-    const updateSimulation = () => {
+    const advanceSimulation = () => {
         simulation.advanceWeek();
         updateGraphData(true);
     };
@@ -160,8 +180,7 @@ function main() {
         alleleLineChart.update();
     }
 
-    // assign to button
-    document.getElementById('advance-week').addEventListener('click', updateSimulation);
+    document.getElementById('advance-week').addEventListener('click', advanceSimulation);
     document.getElementById('toggle-stack').addEventListener('click', toggleGraphStack);
     document.getElementById('advance-10-years').addEventListener('click', () => {
         for (let i = 0; i < 520; i++) {
@@ -169,6 +188,44 @@ function main() {
             updateGraphData();
         }
         alleleLineChart.update();
+    });
+
+    // --- form events ---
+
+    // tie form submission to simulation update
+
+    const form = document.getElementById('config-form');
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const formData = new FormData(form);
+        const carryingCapacity = parseInt(formData.get('carrying-capacity'));
+        const baseSurvivalRate = parseFloat(formData.get('base-survival-rate'));
+        const mismatchPenalty = parseFloat(formData.get('mismatch-penalty'));
+        const selection = formData.get('selection') === 'on';
+        const startWeek = parseInt(formData.get('start-week'));
+        // add drop down for available alleles that can be selected from the scenarios? maybe
+        const newConfig = {
+            carryingCapacity,
+            baseSurvivalRate,
+            mismatchPenalty,
+            selection,
+            startWeek,
+            availableAlleles: simulation.availableAlleles,
+            calculateSnowCoverage: simulationConfig.scenarios[selectedScenarioIndex].options.calculateSnowCoverage,
+            shouldGenerateNewPopulation: simulationConfig.scenarios[selectedScenarioIndex].options.shouldGenerateNewPopulation,
+        };
+        currentConfig = newConfig;
+        replaceSimulation()
+
+        // deselect all presets
+        for (const preset of presetsContainer.children) {
+            preset.classList.remove('preset-entry--selected');
+        }
+    });
+
+    // if selection is not selected, disable the mismatch penalty input
+    form.elements['selection'].addEventListener('change', (event) => {
+        form.elements['mismatch-penalty'].disabled = !event.target.checked;
     });
 }
 
