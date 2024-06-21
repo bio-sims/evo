@@ -5,34 +5,15 @@
  */
 
 import { Chart, LineController, LineElement, Filler, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip } from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/+esm';
-import { Simulation } from "./modules/simulation.js";
 Chart.register(LineController, LineElement, Filler, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip);
+import { Simulation } from "./modules/simulation.js";
+import { simulationConfig } from '../sim.config.js';
 
-// simulation configuration values, scoped to this module
-
-let startWeek = 0;
-const availableAlleles = [
-    { id: 1, type: "coat", brownWeek: 15, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
-    { id: 2, type: "coat", brownWeek: 24, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
-    { id: 3, type: "coat", brownWeek: 26, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
-    { id: 4, type: "coat", brownWeek: 35, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
-];
-const carryingCapacity = 20;
-const baseSurvivalRate = 0.96;
-const mismatchPenalty = 0.07;
-const calculateSnowCoverage = (week) => {
-    const yearWeek = week % 52;
-    if (yearWeek < 18) return 1;
-    if (yearWeek < 36) return 0;
-    return 1;
-};
-const shouldGenerate = (week) => week % 18 === 0;
-
-// charts
+let scenarios = simulationConfig.scenarios;
+let selectedScenarioIndex = 0;
+let currentConfig = scenarios[selectedScenarioIndex].options;
 
 let alleleLineChart = null;
-
-// simulation object
 
 /**
  * @type {Simulation|null}
@@ -40,7 +21,7 @@ let alleleLineChart = null;
 let simulation = null;
 
 function getColorHue(index) {
-    return (index / availableAlleles.length) * 360;
+    return (index / simulation.availableAlleles.length) * 360;
 }
 
 function graphSetup() {
@@ -49,10 +30,10 @@ function graphSetup() {
     const initialFrequency = simulation.getCoatAlleleFrequency();
     const ctx = document.getElementById('allele-line-chart');
     const data = {
-        labels: Array.from({ length: 52 }, (_, i) => i + 1),
+        labels: Array.from({ length: 52 }, (_, i) => i + 1 + simulation.week),
         // make a dataset with the initial allele frequencies
         datasets: Object.keys(initialFrequency).map((alleleId, i) => {
-            const allele = availableAlleles.find((allele) => allele.id === parseInt(alleleId));
+            const allele = simulation.availableAlleles.find((allele) => allele.id === parseInt(alleleId));
             return {
                 label: `Allele ${alleleId}`,
                 data: [initialFrequency[alleleId]],
@@ -67,6 +48,8 @@ function graphSetup() {
         type: 'line',
         data: data,
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: {
                     title: {
@@ -97,7 +80,6 @@ function graphSetup() {
             },
         },
     });
-    console.log(alleleLineChart.data.datasets);
 }
 
 function updateGraphData(refresh = false) {
@@ -112,21 +94,39 @@ function updateGraphData(refresh = false) {
     if (alleleLineChart.data.labels.length < simulation.week + 1) {
         alleleLineChart.data.labels.push(simulation.week);
     }
-    if (refresh) alleleLineChart.update();
+    // dont render points beyond a certain threshold to aid performance
+    if (alleleLineChart.data.labels.length > 512) {
+        alleleLineChart.options.spanGaps = true;
+        alleleLineChart.options.datasets.line.pointRadius = 0;
+        alleleLineChart.options.elements.point.radius = 0;
+    }
+    if (refresh) {
+        alleleLineChart.update();
+    }
+}
+
+function updateScenario() {
+    currentConfig = scenarios[selectedScenarioIndex].options;
+    simulation = new Simulation(currentConfig);
+    window.simulation = simulation; // temp
+    graphSetup();
 }
 
 function main() {
-    simulation = new Simulation({
-        startWeek,
-        availableAlleles,
-        carryingCapacity,
-        baseSurvivalRate,
-        mismatchPenalty,
-        calculateSnowCoverage,
-        shouldGenerate
-    });
-    window.simulation = simulation;
-    graphSetup();
+    updateScenario();
+
+    // add all presets to the div
+    const presetsContainer = document.getElementById('preset-container');
+    for (let i = 0; i < scenarios.length; i++) {
+        const scenario = scenarios[i];
+        const button = document.createElement('button');
+        button.textContent = scenario.name;
+        button.addEventListener('click', () => {
+            selectedScenarioIndex = i;
+            updateScenario();
+        });
+        presetsContainer.appendChild(button);
+    }
 
     const updateSimulation = () => {
         simulation.advanceWeek();
@@ -141,12 +141,18 @@ function main() {
         // set first dataset fill to origin
         alleleLineChart.data.datasets[0].fill = alleleLineChart.options.scales.y.stacked ? 'origin' : false;
         alleleLineChart.update();
-        console.log(alleleLineChart);
     }
 
     // assign to button
     document.getElementById('advance-week').addEventListener('click', updateSimulation);
     document.getElementById('toggle-stack').addEventListener('click', toggleGraphStack);
+    document.getElementById('advance-10-years').addEventListener('click', () => {
+        for (let i = 0; i < 520; i++) {
+            simulation.advanceWeek();
+            updateGraphData();
+        }
+        alleleLineChart.update();
+    });
 }
 
 main();

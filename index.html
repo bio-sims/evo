@@ -9,8 +9,33 @@
     <script type="module" src="js/main.js" defer></script>
 </head>
 <body>
-    <canvas id="allele-line-chart"></canvas>
-    <button id="advance-week">Advance</button>
-    <button id="toggle-stack">Toggle Stack</button>
+    <nav>
+        <h1>Evo</h1>
+        <ul>
+            <li>
+                <!-- Replace later -->
+                <a>About</a>
+            </li>
+        </ul>
+    </nav>
+    <main class="grid">
+        <!-- main card -->
+        <section class="card card--main">
+            <canvas id="allele-line-chart"></canvas>
+        </section>
+        <!-- side cards -->
+        <section class="card card--side">
+            <h1>Preset Scenarios</h1>
+            <div class="buttons" id="preset-container"></div>
+        </section>
+        <section class="card card--side">
+            <h1>Controls</h1>
+            <div class="buttons">
+                <button id="advance-week">Advance Week</button>
+                <button id="toggle-stack">Toggle Stack</button>
+                <button id="advance-10-years">Advance 10 Years</button>
+            </div>
+        </section>
+    </main>
 </body>
 </html>

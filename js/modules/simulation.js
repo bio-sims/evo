@@ -59,8 +59,8 @@ export class Simulation {
          * @returns {boolean} true if a generation should occur, false otherwise
          * @todo Replace with object-based dependency injection
          */
-        this.shouldGenerate =
-            simulationConfig.shouldGenerate ?? ((week) => week % 18 === 0);
+        this.shouldGenerateNewPopulation =
+            simulationConfig.shouldGenerateNewPopulation ?? ((week) => week % 18 === 0);
         /**
          * The current population of hares in the simulation
          * @type {Array<Hare>}
@@ -119,7 +119,7 @@ export class Simulation {
             this.week++;
             return;
         }
-        if (this.shouldGenerate(this.week)) {
+        if (this.shouldGenerateNewPopulation(this.week)) {
             this.doProcreation();
         }
         this.hares.forEach((hare) => {
