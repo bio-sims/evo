@@ -159,7 +159,11 @@ export class Simulation {
 
         // divide by the total number of alleles to get the relative frequency
         for (const allele of this.getPossibleCoatAlleles()) {
-            alleleFrequency[allele.id] /= coatAlleles.length;
+            if (coatAlleles.length === 0) {
+                alleleFrequency[allele.id] = 0;
+            } else {
+                alleleFrequency[allele.id] /= coatAlleles.length;
+            }
         }
 
         return alleleFrequency;
