@@ -66,6 +66,11 @@ export class Simulation {
          * @type {Array<Hare>}
          */
         this.hares = simulationConfig.hares ?? this.getInitialPopulation();
+
+        // disable penalty if simulationConfig.selection is false
+        if (!simulationConfig.selection) {
+            this.mismatchPenalty = 0;
+        }
     }
 
     /**
