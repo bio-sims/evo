@@ -115,17 +115,34 @@ function updateScenario() {
 function main() {
     updateScenario();
 
+    // define basic preset element
+    const presetElement = document.createElement('div');
+    presetElement.classList.add('preset-entry');
+    presetElement.innerHTML = `
+        <h3 class="preset-name"></h3>
+        <p class="preset-description"></p>
+    `;
     // add all presets to the div
     const presetsContainer = document.getElementById('preset-container');
     for (let i = 0; i < scenarios.length; i++) {
-        const scenario = scenarios[i];
-        const button = document.createElement('button');
-        button.textContent = scenario.name;
-        button.addEventListener('click', () => {
+        const preset = scenarios[i];
+        const presetClone = presetElement.cloneNode(true);
+        presetClone.querySelector('.preset-name').textContent = preset.name;
+        presetClone.querySelector('.preset-description').textContent = preset.description;
+        presetClone.addEventListener('click', () => {
+            // remove --selected from all presets
+            for (const preset of presetsContainer.children) {
+                preset.classList.remove('preset-entry--selected');
+            }
+            // add --selected to the clicked preset
+            presetClone.classList.add('preset-entry--selected');
             selectedScenarioIndex = i;
             updateScenario();
         });
-        presetsContainer.appendChild(button);
+        if (i === selectedScenarioIndex) {
+            presetClone.classList.add('preset-entry--selected');
+        }
+        presetsContainer.appendChild(presetClone);
     }
 
     const updateSimulation = () => {
