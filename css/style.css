@@ -6,13 +6,150 @@
     font-family: Avenir, Helvetica, Arial, sans-serif;
 }
 
-/* GLOBAL COLOR VARIABLES */
+/* GLOBAL VARIABLES */
 :root {
     --cr-text-primary: rgb(2, 22, 7);
-    --cr-bg-primary: rgb(255, 255, 255);
+    --cr-text-contrast: rgb(255, 255, 255);
+    --cr-bg-primary: rgb(245, 245, 245);
+    --cr-bg-secondary: rgb(255, 255, 255);
+    --cr-accent: rgb(144, 0, 255);
+    --cr-button: rgb(0, 0, 0);
+    --br-radius-small: 0.25rem;
 }
 
 :root {
     color: var(--cr-text-primary);
     background-color: var(--cr-bg-primary);
+}
+
+button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    min-width: 100px;
+
+    background-color: var(--cr-button);
+    color: var(--cr-text-contrast);
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: all 0.20s ease-in-out;
+
+    &:hover {
+        background-color: var(--cr-accent);
+    }
+
+    &:disabled {
+        background-color: var(--cr-bg-secondary);
+        color: var(--cr-text-grey);
+        cursor: not-allowed;
+    }
+}
+
+body {
+    margin: 0;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 100vh;
+    height: 100lvh;
+    width: 100%;
+    font-family: var(--font-vietnam);
+}
+
+nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: var(--cr-bg-secondary);
+    width: 100%;
+    height: 75px;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+nav > h1 {
+    margin-left: 2rem;
+    margin-right: 2rem;
+    color: var(--text-primary);
+    user-select: none;
+}
+
+nav > ul {
+    display: flex;
+    flex-direction: row;
+    list-style-type: none;
+    gap: 2rem;
+    height: 100%;
+
+    & > li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 6rem;
+        height: 100%;
+        padding: 0.5rem;
+        transition: all 0.10s ease-in-out;
+
+        &:hover {
+            background-color: var(--cr-accent);
+            color: var(--cr-text-contrast);
+            cursor: pointer;
+        }
+
+        & > a {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+        }
+    }
+}
+
+main.grid {
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+main.grid section.card {
+    position: relative;
+    display: flex;
+    padding: 2rem;
+    flex-direction: column;
+    background-color: var(--cr-bg-secondary);
+    border-radius: var(--br-radius-small);
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+    overflow-y: hidden;
+
+    & > h1 {
+        margin-bottom: 1rem;
+    }
+}
+
+main.grid section.card--side {
+    grid-column: span 2;
+    grid-row: span 1;
+}
+
+main.grid section.card--main {
+    grid-column: span 4;
+    grid-row: span 2;
+}
+
+#allele-line-chart {
+    width: 100%;
+    height: 100%;
+}
+
+.card .buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
 }
