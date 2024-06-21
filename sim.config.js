@@ -1,9 +1,9 @@
 // helper variables and functions for the simulation configuration as needed
 const basicAlleles = [
-  { id: 1, type: "coat", brownWeek: 15, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
-  { id: 2, type: "coat", brownWeek: 24, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
-  { id: 3, type: "coat", brownWeek: 26, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
-  { id: 4, type: "coat", brownWeek: 35, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
+  { id: 1, name: "Allele Br15.Wh36", type: "coat", brownWeek: 15, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
+  { id: 2, name: "Allele Br24.Wh36", type: "coat", brownWeek: 24, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
+  { id: 3, name: "Allele Br26.Wh36", type: "coat", brownWeek: 26, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
+  { id: 4, name: "Allele Br35.Wh36", type: "coat", brownWeek: 35, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
 ];
 const stableClimate = (week) => (week % 52 < 18 || week % 52 >= 36) ? 0 : 1;
 const variableClimate = (week) => stableClimate(week);
@@ -19,7 +19,7 @@ const simulationConfig = {
         selection: false,
         startWeek: 0,
         availableAlleles: basicAlleles,
-        carryingCapacity: 1000,
+        carryingCapacity: 500,
         baseSurvivalRate: 0.96,
         mismatchPenalty: 0.07,
         calculateSnowCoverage: stableClimate,
@@ -47,7 +47,7 @@ const simulationConfig = {
         selection: true,
         startWeek: 0,
         availableAlleles: basicAlleles,
-        carryingCapacity: 1000,
+        carryingCapacity: 500,
         baseSurvivalRate: 0.96,
         mismatchPenalty: 0.07,
         calculateSnowCoverage: stableClimate,
@@ -75,10 +75,10 @@ const simulationConfig = {
         selection: true,
         startWeek: 0,
         availableAlleles: basicAlleles,
-        carryingCapacity: 1000,
+        carryingCapacity: 500,
         baseSurvivalRate: 0.96,
         mismatchPenalty: 0.07,
-        calculateSnowCoverage: stableClimate,
+        calculateSnowCoverage: variableClimate,
         shouldGenerateNewPopulation: generationEvery18Weeks,
       }
     },
