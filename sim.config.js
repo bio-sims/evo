@@ -5,8 +5,13 @@ const basicAlleles = [
   { id: 3, name: "Allele Br26.Wh36", type: "coat", brownWeek: 26, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
   { id: 4, name: "Allele Br35.Wh36", type: "coat", brownWeek: 35, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
 ];
-const stableClimate = (week) => (week % 52 < 18 || week % 52 >= 36) ? 0 : 1;
-const variableClimate = (week) => stableClimate(week);
+const stableClimate = (week) => (week % 52 < 18 || week % 52 >= 36) ? 1 : 0;
+const variableClimate = (week) => {
+  // temporarily just choose a random week to stop being snowy, but always start snow in week 36
+  const stopWeek = Math.floor(Math.random() * 18) + 18;
+  const yearWeek = week % 52;
+  return (yearWeek < stopWeek || yearWeek >= 36) ? 1 : 0;
+}
 const generationEvery18Weeks = (week) => week % 18 === 0;
 
 // configure the presented presets for the simulation, which can be tweaked after selection as well.
