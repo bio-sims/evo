@@ -252,6 +252,26 @@ function main() {
         option.textContent = generationFunctions[i].name;
         generationSelect.appendChild(option);
     }
+
+    // --- tab events ---
+
+    const tabs = document.querySelectorAll('.tab');
+    for (const tab of tabs) {
+        tab.addEventListener('click', () => {
+            const tabContent = document.getElementById(tab.dataset.tab);
+            if (!tabContent) return;
+            // get the group and its current active tab/content
+            const tabGroup = tab.dataset.group;
+            const activeTab = document.querySelector(`.tab--active[data-group="${tabGroup}"]`);
+            const activeTabContent = document.getElementById(activeTab.dataset.tab);
+            if (!activeTab || !activeTabContent) return;
+            // move the active class to the clicked tab and its content
+            activeTab.classList.remove('tab--active');
+            activeTabContent.classList.remove('card--active');
+            tab.classList.add('tab--active');
+            tabContent.classList.add('card--active');
+        });
+    }
 }
 
 main();
