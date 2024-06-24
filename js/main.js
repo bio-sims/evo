@@ -9,30 +9,175 @@ Chart.register(LineController, LineElement, Filler, PointElement, LinearScale, T
 import { Simulation } from "./modules/simulation.js";
 import { simulationConfig } from '../sim.config.js';
 
+function getColorHue(index) {
+    return (index / simulation.availableAlleles.length) * 360;
+}
+
+// --- module scoped variables ---
+
 let scenarios = simulationConfig.scenarios;
 let selectedScenarioIndex = 0;
 let currentConfig = scenarios[selectedScenarioIndex].options;
 const climateFunctions = [...new Set(scenarios.map((scenario) => scenario.options.calculateSnowCoverage))];
 const generationFunctions = [...new Set(scenarios.map((scenario) => scenario.options.shouldGenerateNewPopulation))];
 
+// graph related data initialization
+
+let weekLabels = Array.from({ length: 52 }, (_, i) => i + 1);
+let yearLabels = Array.from({ length: 10 }, (_, i) => i + 1);
 let alleleLineChart = null;
+let snowLineChart = null;
+let rawSnowData = [];
+let rawFirstSnowlessWeekData = [];
+
+
+// graph configurations
+
+const alleleGraph = {
+    type: 'line',
+    data: null,
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Week',
+                },
+            },
+            y: {
+                stacked: false,
+                title: {
+                    display: true,
+                    text: 'Frequency',
+                },
+                min: 0,
+                max: 1,
+            },
+        },
+        plugins: {
+            legend: {
+                display: true,
+                text: 'Relative Allele Frequency',
+            },
+            tooltip: {
+                callbacks: {
+                    "title": (context) => `Week ${context[0].label}`,
+                }
+            },
+        },
+    },
+}
+
+
+const snowGraphWeekly = {
+    type: 'line',
+    data: {
+        labels: weekLabels,
+        datasets: [
+            {
+                label: "Snow coverage",
+                data: rawSnowData,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                fill: true,
+            }
+        ]
+    },
+    options: {
+        currentGraph: 'weekly',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Week',
+                },
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Snow Coverage',
+                },
+                min: 0,
+                max: 1,
+            },
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    "title": (context) => `Week ${context[0].label}`,
+                }
+            },
+        },
+    },
+}
+
+const snowGraphYearly = {
+    type: 'line',
+    data: {
+        labels: yearLabels,
+        datasets: [
+            {
+                label: "First Snowless Week",
+                data: rawFirstSnowlessWeekData,
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                fill: true,
+            }
+        ]
+    },
+    options: {
+        currentGraph: 'yearly',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Year',
+                },
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'First Snowless Week',
+                },
+                min: 0,
+                max: 52,
+            },
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    "title": (context) => `Year ${context[0].label}`,
+                }
+            },
+        },
+    },
+}
 
 /**
  * @type {Simulation|null}
 */
 let simulation = null;
 
-function getColorHue(index) {
-    return (index / simulation.availableAlleles.length) * 360;
-}
 
 function graphSetup() {
     if (!simulation) return;
+    // reset label lenghts to the original values
+    weekLabels.length = 52;
+    yearLabels.length = 10;
+
+    // frequency graph
+
     if (alleleLineChart) alleleLineChart.destroy();
     const initialFrequency = simulation.getCoatAlleleFrequency();
-    const ctx = document.getElementById('allele-line-chart');
-    const data = {
-        labels: Array.from({ length: 52 }, (_, i) => i + 1 + simulation.week),
+    const alleleCtx = document.getElementById('allele-line-chart');
+    const alleleData = {
+        labels: weekLabels,
         // make a dataset with the initial allele frequencies
         datasets: Object.keys(initialFrequency).map((alleleId, i) => {
             const allele = simulation.availableAlleles.find((allele) => allele.id === parseInt(alleleId));
@@ -47,54 +192,43 @@ function graphSetup() {
         }),
     }
 
-    alleleLineChart = new Chart(ctx, {
-        type: 'line',
-        data: data,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Week',
-                    },
-                },
-                y: {
-                    stacked: false,
-                    title: {
-                        display: true,
-                        text: 'Frequency',
-                    },
-                    min: 0,
-                    max: 1,
-                },
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    text: 'Relative Allele Frequency',
-                },
-                tooltip: {
-                    callbacks: {
-                        "title": (context) => `Week ${context[0].label}`,
-                    }
-                },
-            },
-        },
-    });
+    alleleLineChart = new Chart(alleleCtx, alleleGraph);
+    alleleLineChart.data = alleleData;
+    alleleLineChart.update();
+
+    // snow graph
+
+    if (snowLineChart) snowLineChart.destroy();
+    const snowCtx = document.getElementById('snow-chart');
+    // set length to 0 to keep reference to the same array
+    rawSnowData.length = 0;
+    rawFirstSnowlessWeekData.length = 0;
+    rawSnowData.push(simulation.snowCoverage);
+
+    snowLineChart = new Chart(snowCtx, snowGraphYearly);
+    console.log(snowLineChart.data);
+    console.log(alleleLineChart.data);
 }
 
-function updateGraphData(refresh = false) {
+function updateLabels() {
+    if (!simulation) return;
+    const currentWeek = simulation.week;
+    const currentYear = Math.floor(currentWeek / 52);
+    if (weekLabels.length <= currentWeek) {
+        weekLabels.push(currentWeek);
+    }
+    if (yearLabels.length < currentYear) {
+        yearLabels.push(currentYear);
+    }
+}
+
+function updateFreqGraphData(refresh = false) {
     // add the current allele frequencies to the chart
     if (!simulation) return;
+    updateLabels();
     const currentFrequency = simulation.getCoatAlleleFrequency();
     for (const dataset of alleleLineChart.data.datasets) {
         dataset.data.push(currentFrequency[dataset.id]);
-    }
-    // if the next week causes the chart to exceed the x-axis, add a new label
-    if (alleleLineChart.data.labels.length < simulation.week + 1) {
-        alleleLineChart.data.labels.push(simulation.week);
     }
     // dont render points beyond a certain threshold to aid performance
     if (alleleLineChart.data.labels.length > 512) {
@@ -104,6 +238,27 @@ function updateGraphData(refresh = false) {
     }
     if (refresh) {
         alleleLineChart.update();
+    }
+}
+
+function updateSnowGraphData(refresh = false) {
+    if (!simulation) return;
+    updateLabels();
+    rawSnowData.push(simulation.snowCoverage);
+    // this assumes that snow coverage being 0 is the first snowless week
+    const year = Math.floor(simulation.week / 52);
+    const week = simulation.week % 52;
+    if (simulation.snowCoverage === 0 && rawFirstSnowlessWeekData.length < year + 1) {
+        rawFirstSnowlessWeekData.push(week);
+    }
+    if (snowLineChart.data.labels.length > 512) {
+        snowLineChart.options.spanGaps = true;
+        snowLineChart.options.datasets.line.pointRadius = 0;
+        snowLineChart.options.elements.point.radius = 0;
+    }
+    if (refresh) {
+        snowLineChart.update();
+        console.log(rawFirstSnowlessWeekData);
     }
 }
 
@@ -174,7 +329,8 @@ function main() {
 
     const advanceSimulation = () => {
         simulation.advanceWeek();
-        updateGraphData(true);
+        updateFreqGraphData(true);
+        updateSnowGraphData(true);
     };
 
     const toggleGraphStack = () => {
@@ -187,15 +343,31 @@ function main() {
         alleleLineChart.update();
     }
 
+    // toggle between snow per week and first snowless week
+    const toggleSnowData = () => {
+        console.log(snowLineChart.options.currentGraph);
+        if (snowLineChart.options.currentGraph === 'weekly') {
+            snowLineChart.destroy();
+            snowLineChart = new Chart(document.getElementById('snow-chart'), snowGraphYearly);
+        } else {
+            snowLineChart.destroy();
+            snowLineChart = new Chart(document.getElementById('snow-chart'), snowGraphWeekly);
+        }
+    }
+
+
     document.getElementById('advance-week').addEventListener('click', advanceSimulation);
     document.getElementById('toggle-stack').addEventListener('click', toggleGraphStack);
     document.getElementById('advance-10-years').addEventListener('click', () => {
         for (let i = 0; i < 520; i++) {
             simulation.advanceWeek();
-            updateGraphData();
+            updateFreqGraphData();
+            updateSnowGraphData();
         }
         alleleLineChart.update();
+        snowLineChart.update();
     });
+    document.getElementById('toggle-snow-data').addEventListener('click', toggleSnowData);
 
     // --- form events ---
 

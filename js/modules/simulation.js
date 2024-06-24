@@ -42,7 +42,7 @@ export class Simulation {
          * Current snow coverage for the simulation
          * @type {number}
          */
-        this.snowCoverage = 0;
+        this.snowCoverage = simulationConfig.calculateSnowCoverage(this.week) ?? 0.5;
         /**
          * The function to determine the snow coverage for a given week
          * @function
