@@ -2,12 +2,15 @@
  * @file Main entry point for the simulation application
  * @author Zachary Mullen
  * @module main
+ * @typedef { import("../../types/climate").ClimateGenerator }
  */
 
 import { Chart, LineController, LineElement, Filler, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip } from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/+esm';
 Chart.register(LineController, LineElement, Filler, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip);
 import { Simulation } from "./modules/simulation.js";
-import { simulationConfig } from '../sim.config.js';
+import configFile from "../sim.config.js";
+import { IntegralStableClimate, IntegralVariableClimate } from "./modules/climate.js";
+import { GenerateEvery18Weeks } from "./modules/generation.js";
 
 function getColorHue(index) {
     return (index / simulation.availableAlleles.length) * 360;
@@ -15,11 +18,28 @@ function getColorHue(index) {
 
 // --- module scoped variables ---
 
-let scenarios = simulationConfig.scenarios;
+let alleleSets = configFile.alleleSets;
+let scenarios = configFile.scenarios;
 let selectedScenarioIndex = 0;
 let currentConfig = scenarios[selectedScenarioIndex].options;
-const climateFunctions = [...new Set(scenarios.map((scenario) => scenario.options.calculateSnowCoverage))];
-const generationFunctions = [...new Set(scenarios.map((scenario) => scenario.options.shouldGenerateNewPopulation))];
+const climateFunctions = {
+    IntegralStableClimate: new IntegralStableClimate(0, 0),
+    IntegralVariableClimate: new IntegralVariableClimate(0, 0),
+}
+const generationFunctions = {
+    GenerationEvery18Weeks: new GenerateEvery18Weeks(0),
+}
+// replace the string names with the actual functions
+for (const scenario of scenarios) {
+    scenario.options.climateGenerator = climateFunctions[scenario.options.climateGenerator];
+    scenario.options.generationGenerator = generationFunctions[scenario.options.generationGenerator];
+}
+// replace any string names in scenario's available alleles with the actual objects
+for (const scenario of scenarios) {
+    if (typeof scenario.options.availableAlleles === 'string') {
+        scenario.options.availableAlleles = alleleSets[scenario.options.availableAlleles];
+    }
+}
 
 // graph related data initialization
 
@@ -267,6 +287,10 @@ function replaceSimulation() {
 }
 
 function updateScenario() {
+    // recreate the climate generators since they may have random elements
+    for (const [key, value] of Object.entries(climateFunctions)) {
+        climateFunctions[key] = new value.constructor(0, 0);
+    }
     currentConfig = scenarios[selectedScenarioIndex].options;
     // set all form values to the current scenario
     const form = document.getElementById('config-form');
@@ -286,8 +310,9 @@ function updateScenario() {
     // set the climate and generation functions, matching by name
     const climateSelect = form.elements['climate-function'];
     const generationSelect = form.elements['generation-function'];
-    climateSelect.value = climateFunctions.findIndex((fn) => fn.name === currentConfig.calculateSnowCoverage.name);
-    generationSelect.value = generationFunctions.findIndex((fn) => fn.name === currentConfig.shouldGenerateNewPopulation.name);
+    // find the index based on the constructor name
+    climateSelect.value = Object.keys(climateFunctions).find((key) => climateFunctions[key].constructor.name === currentConfig.climateGenerator.constructor.name);
+    generationSelect.value = Object.keys(generationFunctions).find((key) => generationFunctions[key].constructor.name === currentConfig.generationGenerator.constructor.name);
 
     replaceSimulation()
 }
@@ -379,8 +404,8 @@ function main() {
         const mismatchPenalty = parseFloat(formData.get('mismatch-penalty'));
         const selection = formData.get('selection') === 'on';
         const startWeek = parseInt(formData.get('start-week'));
-        const climateFunctionIndex = parseInt(formData.get('climate-function'));
-        const generationFunctionIndex = parseInt(formData.get('generation-function'));
+        const climateFunctionKey = formData.get('climate-function');
+        const generationFunctionKey = formData.get('generation-function');
         // add drop down for available alleles that can be selected from the scenarios? maybe
         const newConfig = {
             carryingCapacity,
@@ -389,8 +414,8 @@ function main() {
             selection,
             startWeek,
             availableAlleles: simulation.availableAlleles,
-            calculateSnowCoverage: climateFunctions[climateFunctionIndex],
-            shouldGenerateNewPopulation: generationFunctions[generationFunctionIndex],
+            climateGenerator: climateFunctions[climateFunctionKey],
+            generationGenerator: generationFunctions[generationFunctionKey],
         };
         currentConfig = newConfig;
         replaceSimulation()
@@ -406,24 +431,22 @@ function main() {
         form.elements['mismatch-penalty'].disabled = !event.target.checked;
     });
 
-    // get a list of all unique climate and generation functions from the scenarios, eventually this will be pre-configured
     const climateSelect = form.elements['climate-function'];
     const generationSelect = form.elements['generation-function'];
 
-    for (let i = 0; i < climateFunctions.length; i++) {
+    for (const [key, value] of Object.entries(climateFunctions)) {
         const option = document.createElement('option');
-        option.value = i;
-        option.textContent = climateFunctions[i].name;
+        option.value = key;
+        option.textContent = value.constructor.name;
         climateSelect.appendChild(option);
     }
 
-    for (let i = 0; i < generationFunctions.length; i++) {
+    for (const [key, value] of Object.entries(generationFunctions)) {
         const option = document.createElement('option');
-        option.value = i;
-        option.textContent = generationFunctions[i].name;
+        option.value = key;
+        option.textContent = value.constructor.name;
         generationSelect.appendChild(option);
     }
-
     // --- tab events ---
 
     const tabs = document.querySelectorAll('.tab');

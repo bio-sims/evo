@@ -2,9 +2,13 @@
  * @file Simulation class definition
  * @author Zachary Mullen
  * @module simulation
+ * @typedef { import("../../types/climate").ClimateGenerator }
+ * @typedef { import("../../types/generation").GenerationGenerator }
  */
 
 import { Hare } from "./hare.js";
+import { IntegralStableClimate } from "./climate.js";
+import { GenerateEvery18Weeks } from "./generation.js";
 
 export class Simulation {
     /**
@@ -22,7 +26,7 @@ export class Simulation {
          * The available alleles for hares in the simulation
          * @type {Array<Object>}
          */
-        this.availableAlleles = simulationConfig.availableAlleles;
+        this.availableAlleles = simulationConfig.availableAlleles ?? [];
         /**
          * Maximum number of hares that can be in the simulation
          * @type {number}
@@ -42,25 +46,17 @@ export class Simulation {
          * Current snow coverage for the simulation
          * @type {number}
          */
-        this.snowCoverage = simulationConfig.calculateSnowCoverage(this.week) ?? 0.5;
+        this.snowCoverage = 0;
         /**
-         * The function to determine the snow coverage for a given week
-         * @function
-         * @param {number} week - the week to determine snow coverage for
-         * @returns {number} the snow coverage for the given week
-         * @todo Replace with object-based dependency injection
+         * The class to generate climate data for the simulation
+         * @type {ClimateGenerator}
          */
-        this.calculateSnowCoverage =
-            simulationConfig.calculateSnowCoverage ?? ((week) => 0.5);
+        this.climateGenerator = simulationConfig.climateGenerator ?? new IntegralStableClimate(this.week, 0);
         /**
-         * The function to determine when a generation should occur
-         * @function
-         * @param {number} week - the week to determine if a generation should occur
-         * @returns {boolean} true if a generation should occur, false otherwise
-         * @todo Replace with object-based dependency injection
+         * The class to determine when a generation should occur
+         * @type {GenerationGenerator}
          */
-        this.shouldGenerateNewPopulation =
-            simulationConfig.shouldGenerateNewPopulation ?? ((week) => week % 18 === 0);
+        this.generationGenerator = simulationConfig.generationGenerator ?? new GenerateEvery18Weeks(this.week);
         /**
          * The current population of hares in the simulation
          * @type {Array<Hare>}
@@ -71,6 +67,8 @@ export class Simulation {
         if (!simulationConfig.selection) {
             this.mismatchPenalty = 0;
         }
+        console.log(this.climateGenerator);
+        this.snowCoverage = this.climateGenerator.getSnowCoverage();
     }
 
     /**
@@ -114,12 +112,12 @@ export class Simulation {
      * Advances the simulation by one week
      */
     advanceWeek() {
-        this.snowCoverage = this.calculateSnowCoverage(this.week);
+        this.snowCoverage = this.climateGenerator.getSnowCoverage();
         if (this.hares.length === 0) {
             this.week++;
             return;
         }
-        if (this.shouldGenerateNewPopulation(this.week)) {
+        if (this.generationGenerator.shouldGenerate()) {
             this.doProcreation();
         }
         this.hares.forEach((hare) => {
@@ -133,6 +131,8 @@ export class Simulation {
         // remove dead hares
         this.hares = this.hares.filter((hare) => hare.alive);
         this.week++;
+        this.climateGenerator.advanceWeek();
+        this.generationGenerator.advanceWeek();
     }
 
     getPossibleCoatAlleles() {
