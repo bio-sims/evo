@@ -190,12 +190,13 @@ function graphSetup() {
                 fill: false,
             };
         }),
-    }
+    };
 
+    // ensure the graph is not stacked
+    alleleGraph.options.scales.y.stacked = false;
     alleleLineChart = new Chart(alleleCtx, alleleGraph);
     alleleLineChart.data = alleleData;
     alleleLineChart.update();
-
     // snow graph
 
     if (snowLineChart) snowLineChart.destroy();
@@ -206,8 +207,6 @@ function graphSetup() {
     rawSnowData.push(simulation.snowCoverage);
 
     snowLineChart = new Chart(snowCtx, snowGraphYearly);
-    console.log(snowLineChart.data);
-    console.log(alleleLineChart.data);
 }
 
 function updateLabels() {
@@ -258,7 +257,6 @@ function updateSnowGraphData(refresh = false) {
     }
     if (refresh) {
         snowLineChart.update();
-        console.log(rawFirstSnowlessWeekData);
     }
 }
 
@@ -345,7 +343,6 @@ function main() {
 
     // toggle between snow per week and first snowless week
     const toggleSnowData = () => {
-        console.log(snowLineChart.options.currentGraph);
         if (snowLineChart.options.currentGraph === 'weekly') {
             snowLineChart.destroy();
             snowLineChart = new Chart(document.getElementById('snow-chart'), snowGraphYearly);
@@ -382,6 +379,8 @@ function main() {
         const mismatchPenalty = parseFloat(formData.get('mismatch-penalty'));
         const selection = formData.get('selection') === 'on';
         const startWeek = parseInt(formData.get('start-week'));
+        const climateFunctionIndex = parseInt(formData.get('climate-function'));
+        const generationFunctionIndex = parseInt(formData.get('generation-function'));
         // add drop down for available alleles that can be selected from the scenarios? maybe
         const newConfig = {
             carryingCapacity,
@@ -390,8 +389,8 @@ function main() {
             selection,
             startWeek,
             availableAlleles: simulation.availableAlleles,
-            calculateSnowCoverage: simulationConfig.scenarios[selectedScenarioIndex].options.calculateSnowCoverage,
-            shouldGenerateNewPopulation: simulationConfig.scenarios[selectedScenarioIndex].options.shouldGenerateNewPopulation,
+            calculateSnowCoverage: climateFunctions[climateFunctionIndex],
+            shouldGenerateNewPopulation: generationFunctions[generationFunctionIndex],
         };
         currentConfig = newConfig;
         replaceSimulation()
