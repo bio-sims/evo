@@ -6,6 +6,7 @@ const basicAlleles = [
   { id: 4, name: "Allele Br35.Wh36", type: "coat", brownWeek: 35, brownRate: 1, whiteWeek: 36, whiteRate: 1 },
 ];
 const stableClimate = (week) => (week % 52 < 18 || week % 52 >= 36) ? 1 : 0;
+// this does not work as intended, replace with a better implementation
 const variableClimate = (week) => {
   // temporarily just choose a random week to stop being snowy, but always start snow in week 36
   const stopWeek = Math.floor(Math.random() * 18) + 18;
