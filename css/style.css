@@ -15,6 +15,7 @@
     --cr-accent: rgb(144, 0, 255);
     --cr-button: rgb(0, 0, 0);
     --br-radius-small: 0.25rem;
+    --cr-warning: rgb(255, 0, 0);
 }
 
 :root {
@@ -230,4 +231,37 @@ main.card-container section.card {
     &.checkbox {
         flex-direction: row;
     }
+}
+
+article.genotype-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    background-color: var(--cr-bg-secondary);
+}
+
+article.genotype-grid .grid-hare {
+    min-width: 1.75rem;
+    min-height: 1.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.30);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+article.genotype-grid .grid-hare--mismatch::before {
+    content: "X";
+    color: var(--cr-warning);
+    font-weight: bold;
+    font-size: 1.25rem;
+    /* TODO: fix this shadow outline */
+    text-shadow:
+        0px 0px 1px #000,
+        -1px 1px 1px #000,
+        0px 0px 1px #000,
+        1px 0px 1px #000;
+    text-align: center;
 }

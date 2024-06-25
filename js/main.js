@@ -11,6 +11,7 @@ import { Simulation } from "./modules/simulation.js";
 import configFile from "../sim.config.js";
 import { IntegralStableClimate, IntegralVariableClimate } from "./modules/climate.js";
 import { GenerateEvery18Weeks } from "./modules/generation.js";
+import hareGrid from "./modules/grid.js";
 
 function getColorHue(index) {
     return (index / simulation.availableAlleles.length) * 360;
@@ -21,19 +22,15 @@ function getColorHue(index) {
 let alleleSets = configFile.alleleSets;
 let scenarios = configFile.scenarios;
 let selectedScenarioIndex = 0;
-let currentConfig = scenarios[selectedScenarioIndex].options;
-const climateFunctions = {
+// copy with spread operator to avoid modifying the original
+let climateFunctions = {
     IntegralStableClimate: new IntegralStableClimate(0, 0),
     IntegralVariableClimate: new IntegralVariableClimate(0, 0),
 }
-const generationFunctions = {
+let generationFunctions = {
     GenerationEvery18Weeks: new GenerateEvery18Weeks(0),
 }
-// replace the string names with the actual functions
-for (const scenario of scenarios) {
-    scenario.options.climateGenerator = climateFunctions[scenario.options.climateGenerator];
-    scenario.options.generationGenerator = generationFunctions[scenario.options.generationGenerator];
-}
+let currentConfig = { ...scenarios[selectedScenarioIndex].options };
 // replace any string names in scenario's available alleles with the actual objects
 for (const scenario of scenarios) {
     if (typeof scenario.options.availableAlleles === 'string') {
@@ -47,6 +44,7 @@ let weekLabels = Array.from({ length: 52 }, (_, i) => i + 1);
 let yearLabels = Array.from({ length: 10 }, (_, i) => i + 1);
 let alleleLineChart = null;
 let snowLineChart = null;
+let genotypeGrid = null;
 let rawSnowData = [];
 let rawFirstSnowlessWeekData = [];
 let alleleGraphDatasets = null;
@@ -214,8 +212,8 @@ function graphSetup() {
                 id: alleleId,
                 label: `${allele.name}`,
                 data: [initialFrequency[alleleId]],
-                borderColor: `hsla(${getColorHue(i)}, 100%, 50%, 1)`,
-                backgroundColor: `hsla(${getColorHue(i)}, 100%, 50%, 0.5)`,
+                borderColor: allele.geneColor ?? `hsla(${getColorHue(i)}, 100%, 50%, 1)`,
+                backgroundColor: allele.geneColor ? `${allele.geneColor}80` : `hsla(${getColorHue(i)}, 100%, 50%, 0.5)`,
                 fill: false,
             };
         }),
@@ -292,7 +290,10 @@ function updateSnowGraphData(refresh = false) {
 function replaceSimulation() {
     simulation = new Simulation(currentConfig);
     window.simulation = simulation; // temp
+    // initialize grid
+    genotypeGrid = new hareGrid(simulation, 'genotype-grid');
     graphSetup();
+    genotypeGrid.updateGrid();
 }
 
 function updateScenario() {
@@ -303,7 +304,10 @@ function updateScenario() {
     for (const [key, value] of Object.entries(generationFunctions)) {
         generationFunctions[key] = new value.constructor(currentConfig.startWeek);
     }
-    currentConfig = scenarios[selectedScenarioIndex].options;
+    currentConfig = { ...scenarios[selectedScenarioIndex].options };
+    // replace the climate and generation function strings with the actual objects
+    currentConfig.climateGenerator = climateFunctions[currentConfig.climateGenerator];
+    currentConfig.generationGenerator = generationFunctions[currentConfig.generationGenerator];
     // set all form values to the current scenario
     const form = document.getElementById('config-form');
     form.elements['carrying-capacity'].value = currentConfig.carryingCapacity;
@@ -322,11 +326,10 @@ function updateScenario() {
     // set the climate and generation functions, matching by name
     const climateSelect = form.elements['climate-function'];
     const generationSelect = form.elements['generation-function'];
-    // find the index based on the constructor name
-    climateSelect.value = Object.keys(climateFunctions).find((key) => climateFunctions[key].constructor.name === currentConfig.climateGenerator.constructor.name);
-    generationSelect.value = Object.keys(generationFunctions).find((key) => generationFunctions[key].constructor.name === currentConfig.generationGenerator.constructor.name);
-
-    replaceSimulation()
+    // find the index based on the original scenario's name
+    climateSelect.selectedIndex = Array.from(climateSelect.options).findIndex((option) => option.value === scenarios[selectedScenarioIndex].options.climateGenerator);
+    generationSelect.selectedIndex = Array.from(generationSelect.options).findIndex((option) => option.value === scenarios[selectedScenarioIndex].options.generationGenerator);
+    replaceSimulation();
 }
 
 function main() {
@@ -366,6 +369,7 @@ function main() {
         simulation.advanceWeek();
         updateFreqGraphData(true);
         updateSnowGraphData(true);
+        genotypeGrid.updateGrid();
     };
 
     const toggleGraphStack = () => {
@@ -400,6 +404,7 @@ function main() {
         }
         alleleLineChart.update();
         snowLineChart.update();
+        genotypeGrid.updateGrid();
     });
     document.getElementById('toggle-snow-data').addEventListener('click', toggleSnowData);
 

@@ -61,7 +61,12 @@ export class Simulation {
          * The current population of hares in the simulation
          * @type {Array<Hare>}
          */
-        this.hares = simulationConfig.hares ?? this.getInitialPopulation();
+        this.hares = this.getInitialPopulation();
+        /**
+         * The available ids for hares in the simulation
+         * @type {Array<number>}
+         */
+        this.availableIds = [];
 
         // disable penalty if simulationConfig.selection is false
         if (!simulationConfig.selection) {
@@ -82,7 +87,7 @@ export class Simulation {
                 this.availableAlleles[i % this.availableAlleles.length],
                 this.availableAlleles[(i + 1) % this.availableAlleles.length],
             ];
-            const newHare = new Hare(0, alleles);
+            const newHare = new Hare(0, alleles, i);
             newHare.whiteness = newHare.getProjectedWhiteness(this.week);
             hares.push(newHare);
         }
@@ -93,6 +98,13 @@ export class Simulation {
      * Generates a population of hares for the simulation with random alleles based on the current population
      */
     doProcreation() {
+        // remove dead hares and add their ids back to the available pool
+        this.hares = this.hares.filter((hare) => {
+            if (!hare.alive) {
+                this.availableIds.push(hare.id);
+            }
+            return hare.alive;
+        });
         // get every allele for every hare in the population including duplicates
         const allelePool = this.hares.flatMap((hare) => hare.alleles);
         // fill the population with new hares by randomly selecting alleles from the pool
@@ -101,7 +113,7 @@ export class Simulation {
             for (let j = 0; j < 2; j++) {
                 alleles.push(allelePool[Math.floor(Math.random() * allelePool.length)]);
             }
-            const newHare = new Hare(0, alleles);
+            const newHare = new Hare(0, alleles, this.availableIds.pop());
             newHare.whiteness = newHare.getProjectedWhiteness(this.week);
             this.hares.push(newHare);
         }
@@ -127,8 +139,6 @@ export class Simulation {
                 this.week
             );
         });
-        // remove dead hares
-        this.hares = this.hares.filter((hare) => hare.alive);
         this.week++;
         this.climateGenerator.advanceWeek();
         this.generationGenerator.advanceWeek();
@@ -138,11 +148,16 @@ export class Simulation {
         return this.availableAlleles.filter((allele) => allele.type === "coat");
     }
 
+    getAliveHares() {
+        return this.hares.filter((hare) => hare.alive);
+    }
+
     /**
      * Calculate the relative frequency of each coat allele in the population
      */
     getCoatAlleleFrequency() {
-        const popAlleles = this.hares.flatMap((hare) => hare.alleles);
+        const aliveHares = this.getAliveHares();
+        const popAlleles = aliveHares.flatMap((hare) => hare.alleles);
         const coatAlleles = popAlleles.filter((allele) => allele.type === "coat");
 
         // make a json object with all the possible coat alleles
