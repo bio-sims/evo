@@ -9,7 +9,8 @@ export default
         "brownWeek": 15,
         "brownRate": 1,
         "whiteWeek": 36,
-        "whiteRate": 1
+        "whiteRate": 1,
+        "geneColor": "#ff0000"
       },
       {
         "id": 2,
@@ -18,7 +19,8 @@ export default
         "brownWeek": 24,
         "brownRate": 1,
         "whiteWeek": 36,
-        "whiteRate": 1
+        "whiteRate": 1,
+        "geneColor": "#80ff00"
       },
       {
         "id": 3,
@@ -27,7 +29,8 @@ export default
         "brownWeek": 26,
         "brownRate": 1,
         "whiteWeek": 36,
-        "whiteRate": 1
+        "whiteRate": 1,
+        "geneColor": "#00ffff"
       },
       {
         "id": 4,
@@ -36,7 +39,8 @@ export default
         "brownWeek": 35,
         "brownRate": 1,
         "whiteWeek": 36,
-        "whiteRate": 1
+        "whiteRate": 1,
+        "geneColor": "#8000ff"
       }
     ]
   },

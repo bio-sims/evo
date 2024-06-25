@@ -7,13 +7,28 @@
 
 const MISMATCH_CONTRAST_PERCENTAGE = 0.6;
 
+/**
+ * Convert a hex color to RGB
+ * @param {string} hex - hex color to convert to RGB
+ * @todo consider moving to a utility file or something similar
+ */
+const convertHexToRGB = (hex) => {
+    if (!hex.startsWith("#")) {
+        throw new Error("Hex color must start with #");
+    }
+    const r = parseInt(hex.substring(1, 3), 16);
+    const g = parseInt(hex.substring(3, 5), 16);
+    const b = parseInt(hex.substring(5, 7), 16);
+    return { r, g, b };
+};
+
 export class Hare {
     /**
      * Represents a hare
      * @param {number} whiteness - percentage of fur that is white
      * @param {Array<Object>} alleles - list of alleles that determine behavior
      */
-    constructor(whiteness, alleles) {
+    constructor(whiteness, alleles, id = -1) {
         /**
          * Whether the hare is alive
          * @type {boolean}
@@ -29,6 +44,11 @@ export class Hare {
          * @type {Array<Object>}
          */
         this.alleles = alleles;
+        /**
+         * The id of the hare, which should always be unique and below the carrying capacity
+         * @type {number}
+         */
+        this.id = id;
     }
 
     /**
@@ -69,14 +89,41 @@ export class Hare {
      */
     getProjectedWhiteness(week) {
         const { brownStart, brownRate, whiteStart, whiteRate } = this.getTransitionPhenotype();
-        let whiteness = this.whiteness;
         const yearWeek = week % 52;
-        if (yearWeek >= whiteStart) {
-            whiteness = Math.min(1, whiteness + whiteRate * (yearWeek - whiteStart));
-        } else if (yearWeek >= brownStart) {
-            whiteness = Math.max(0, whiteness - brownRate * (yearWeek - brownStart));
+        let whiteness = this.whiteness;
+        if (yearWeek >= brownStart && yearWeek < whiteStart) {
+            whiteness = Math.max(0, whiteness - brownRate * (whiteStart - yearWeek));
+        } else {
+            whiteness = Math.min(1, whiteness + whiteRate * (yearWeek + 52 - whiteStart));
         }
         return whiteness;
+    }
+
+    /**
+     * Get the genotype color of the hare
+     * @returns {string} the hex color of the hare's genotype
+     */
+    getGenotypeColor() {
+        // mix the colors of the coat alleles
+        const coatAlleles = this.alleles.filter((allele) => allele.type === "coat");
+        const colors = coatAlleles.map((allele) => convertHexToRGB(allele.geneColor));
+        
+        if (colors.length === 0) {
+            return "#000000";
+        }
+        const averageColor = colors.reduce((acc, color) => {
+            acc.r += color.r;
+            acc.g += color.g;
+            acc.b += color.b;
+            return acc;
+        }, { r: 0, g: 0, b: 0 });
+
+        for (const key in averageColor) {
+            averageColor[key] = Math.floor(averageColor[key] / colors.length);
+        }
+        // return as hex
+        const rgbValToHex = (val) => val.toString(16).padStart(2, "0");
+        return `#${rgbValToHex(averageColor.r)}${rgbValToHex(averageColor.g)}${rgbValToHex(averageColor.b)}`;
     }
 
     /**
