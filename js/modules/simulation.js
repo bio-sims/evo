@@ -67,7 +67,6 @@ export class Simulation {
         if (!simulationConfig.selection) {
             this.mismatchPenalty = 0;
         }
-        console.log(this.climateGenerator);
         this.snowCoverage = this.climateGenerator.getSnowCoverage();
     }
 

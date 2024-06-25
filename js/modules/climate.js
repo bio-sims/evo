@@ -19,6 +19,7 @@ class IntegralStableClimate {
         this.currentSnowlessYearWeek = this.baseSnowlessYearWeek;
         this.snowWeek = 36;
     }
+
     advanceWeek() {
         const yearWeek = this.week % 52;
         // if start of year, choose a random week within a delta of 1 week of the base week
@@ -26,15 +27,15 @@ class IntegralStableClimate {
             const delta = Math.floor(Math.random() * 3) - 1;
             this.currentSnowlessYearWeek = this.baseSnowlessYearWeek + delta
         }
-        // set the temperature based on whether it snows
-        if (this.snowWeek === yearWeek) {
+        // set the temperature to 0 if it is between the snowless week and the snow week
+        if (yearWeek < this.currentSnowlessYearWeek || yearWeek >= this.snowWeek) {
             this.temperature = 0;
-        }
-        if (this.currentSnowlessYearWeek === yearWeek) {
+        } else {
             this.temperature = 10;
         }
         this.week++;
     }
+
     getSnowCoverage() {
         if (this.temperature < 1) {
             return 1;
