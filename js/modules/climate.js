@@ -21,6 +21,10 @@ class IntegralStableClimate {
     }
 
     advanceWeek() {
+        this.week++;
+    }
+    
+    getSnowCoverage() {
         const yearWeek = this.week % 52;
         // if start of year, choose a random week within a delta of 1 week of the base week
         if (yearWeek === 0) {
@@ -33,10 +37,6 @@ class IntegralStableClimate {
         } else {
             this.temperature = 10;
         }
-        this.week++;
-    }
-
-    getSnowCoverage() {
         if (this.temperature < 1) {
             return 1;
         }

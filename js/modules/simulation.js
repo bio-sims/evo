@@ -96,6 +96,7 @@ export class Simulation {
 
     /**
      * Generates a population of hares for the simulation with random alleles based on the current population
+     * @returns {boolean} true if the population was successfully generated, false otherwise (wiped out population)
      */
     doProcreation() {
         // remove dead hares and add their ids back to the available pool
@@ -105,10 +106,14 @@ export class Simulation {
             }
             return hare.alive;
         });
+        // do not populate if there are no hares to breed
+        if (this.hares.length === 0) {
+            return false;
+        }
         // get every allele for every hare in the population including duplicates
         const allelePool = this.hares.flatMap((hare) => hare.alleles);
         // fill the population with new hares by randomly selecting alleles from the pool
-        for (let i = this.hares.length - 1; i < this.carryingCapacity; i++) {
+        for (let i = this.hares.length - 1; i < this.carryingCapacity - 1; i++) {
             const alleles = [];
             for (let j = 0; j < 2; j++) {
                 alleles.push(allelePool[Math.floor(Math.random() * allelePool.length)]);
@@ -117,6 +122,7 @@ export class Simulation {
             newHare.whiteness = newHare.getProjectedWhiteness(this.week);
             this.hares.push(newHare);
         }
+        return true;
     }
 
     /**

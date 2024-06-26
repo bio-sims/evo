@@ -188,6 +188,10 @@ main.card-container section.card {
     z-index: 1;
 }
 
+.card > div.canvas {
+    min-height: 600px;
+}
+
 .card-panel > .card-tabs > section.card {
     display: none;
     border-radius: 0 var(--br-radius-small) var(--br-radius-small) var(--br-radius-small);
@@ -217,19 +221,22 @@ main.card-container section.card {
     border-radius: var(--br-radius-small);
 }
 
-#config-form {
+form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-#config-form > .input-group {
+form > .input-group {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 
-    &.checkbox {
+    &.row {
         flex-direction: row;
+    }
+    & output {
+        display: inline-block;
     }
 }
 
@@ -264,4 +271,8 @@ article.genotype-grid .grid-hare--mismatch::before {
         0px 0px 1px #000,
         1px 0px 1px #000;
     text-align: center;
+}
+
+#control-form {
+    margin-bottom: 1rem;
 }
