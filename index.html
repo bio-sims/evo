@@ -21,11 +21,47 @@
     <main class="card-container">
         <!-- side cards -->
         <div class="card-panel card-panel--side">
+            <section class="card card--side" id="control-card">
+                <h1>Evo Controls</h1>
+                <form id="control-form">
+                    <!-- Change rate of advancement -->
+                    <div class="input-group row">
+                        <label for="advance-rate-value">Advance every </label>
+                        <input type="number" id="advance-rate-value" name="advance-rate-value" value="1">
+                        <select id="advance-rate-type" name="advance-rate-type">
+                            <option value="weeks">weeks</option>
+                            <option value="generations">generations</option>
+                            <option value="years">years</option>
+                        </select>
+                    </div>
+                    <!-- Change end condition, choice between generation count or year/weeks, like "End after x generations" or "End after x years" -->
+                    <div class="input-group row">
+                        <input type="checkbox" id="do-end-condition" name="do-end-condition">
+                        <label for="end-condition-value">Stop playing after</label>
+                        <input type="number" id="end-condition-value" name="end-condition-value" value="10">
+                        <span>iterations</span>
+                    </div>
+                    <!-- Change the speed of the simulation -->
+                    <div class="input-group">
+                        <label for="play-rate">Playback speed</label>
+                        <input type="range" id="play-rate" name="play-rate" min="100" max="2500" step="10" value="1" oninput="this.nextElementSibling.firstElementChild.value = this.value">
+                        <div class="range-labels">
+                            <output for="play-rate" id="play-rate-output">1</output>
+                            <span>ms</span>
+                        </div>
+                    </div>
+                </form>
+                <div class="buttons">
+                    <button id="advance-button">Advance</button>
+                    <button id="play-button">Play</button>
+                    <button id="reset-button">Reset</button>
+                </div>
+            </section>
             <section class="card card--side" id="preset-card">
                 <h1>Preset Scenarios</h1>
                 <div class="buttons" id="preset-container"></div>
             </section>
-            <section class="card card--side" id="preset-card">
+            <section class="card card--side" id="config-card">
                 <h1>Configuration</h1>
                 <form id="config-form">
                     <div class="input-group">
@@ -54,7 +90,7 @@
                         <label for="start-week">Start Week</label>
                         <input type="number" id="start-week" name="start-week" value="0">
                     </div>
-                    <div class="input-group checkbox">
+                    <div class="input-group row">
                         <label for="selection">Do selection?</label>
                         <input type="checkbox" id="selection" name="selection" checked>
                     </div>
@@ -73,22 +109,24 @@
                     <button class="tab" data-tab="snow-graph" data-group="main">Snow coverage</button>
                 </div>
                 <section class="card card--active tab-content" id="frequency-graph" data-group="main">
-                    <canvas id="allele-line-chart"></canvas>
+                    <div class="canvas">
+                        <canvas id="allele-line-chart"></canvas>
+                    </div>
+                    <div class="buttons">
+                        <button id="toggle-stack" class="chart-button">Toggle view</button>
+                    </div>
                 </section>
                 <section class="card tab-content" id="hare-grid" data-group="main">
                     <article class="genotype-grid" id="genotype-grid"></article>
                 </section>
                 <section class="card tab-content" id="snow-graph" data-group="main">
-                    <canvas id="snow-chart"></canvas>
+                    <div class="canvas">
+                        <canvas id="snow-chart"></canvas>
+                    </div>
+                    <div class="buttons">
+                        <button id="toggle-snow-data">Toggle Snow Data</button>
+                    </div>
                 </section>
-            </section>
-            <section class="card">
-                <div class="buttons">
-                    <button id="advance-week">Advance Week</button>
-                    <button id="advance-10-years">Advance 10 Years</button>
-                    <button id="toggle-stack">Toggle Stack</button>
-                    <button id="toggle-snow-data">Toggle Snow Data</button>
-                </div>
             </section>
         </div>
     </main>

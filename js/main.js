@@ -38,10 +38,20 @@ for (const scenario of scenarios) {
     }
 }
 
+// globals related to simulation control
+
+let advanceRateValue = 1;
+let advanceRateType = 'weeks';
+let currentInterval = null;
+let populationWiped = false;
+let doEndCondition = false;
+let endConditionValue = 1;
+let playRate = 250;
+
 // graph related data initialization
 
-let weekLabels = Array.from({ length: 52 }, (_, i) => i + 1);
-let yearLabels = Array.from({ length: 10 }, (_, i) => i + 1);
+let weekLabels = Array.from({ length: 52 }, (_, i) => i);
+let yearLabels = Array.from({ length: 10 }, (_, i) => i);
 let alleleLineChart = null;
 let snowLineChart = null;
 let genotypeGrid = null;
@@ -195,8 +205,8 @@ let simulation = null;
 function graphSetup() {
     if (!simulation) return;
     // set 52 weeks from the current week as the initial
-    weekLabels = Array.from({ length: 52 }, (_, i) => i + 1 + simulation.week);
-    yearLabels = Array.from({ length: 10 }, (_, i) => i + 1 + Math.floor(simulation.week / 52));
+    weekLabels = Array.from({ length: 52 }, (_, i) => i + simulation.week);
+    yearLabels = Array.from({ length: 10 }, (_, i) => i + Math.floor(simulation.week / 52));
 
     // frequency graph
 
@@ -288,6 +298,23 @@ function updateSnowGraphData(refresh = false) {
 }
 
 function replaceSimulation() {
+    // clear interval if it exists, update pause button text
+    if (currentInterval) {
+        clearInterval(currentInterval);
+        currentInterval = null;
+    }
+    // reset text regardless
+    document.getElementById('play-button').textContent = 'Play';
+    // regenerate the climate and generation functions
+    for (const [key, value] of Object.entries(climateFunctions)) {
+        climateFunctions[key] = new value.constructor(currentConfig.startWeek, 0);
+    }
+    for (const [key, value] of Object.entries(generationFunctions)) {
+        generationFunctions[key] = new value.constructor(currentConfig.startWeek);
+    }
+    // replace the climate and generation function strings with the actual objects
+    currentConfig.climateGenerator = climateFunctions[currentConfig.climateGenerator];
+    currentConfig.generationGenerator = generationFunctions[currentConfig.generationGenerator];
     simulation = new Simulation(currentConfig);
     window.simulation = simulation; // temp
     // initialize grid
@@ -305,9 +332,6 @@ function updateScenario() {
         generationFunctions[key] = new value.constructor(currentConfig.startWeek);
     }
     currentConfig = { ...scenarios[selectedScenarioIndex].options };
-    // replace the climate and generation function strings with the actual objects
-    currentConfig.climateGenerator = climateFunctions[currentConfig.climateGenerator];
-    currentConfig.generationGenerator = generationFunctions[currentConfig.generationGenerator];
     // set all form values to the current scenario
     const form = document.getElementById('config-form');
     form.elements['carrying-capacity'].value = currentConfig.carryingCapacity;
@@ -365,12 +389,77 @@ function main() {
         presetsContainer.appendChild(presetClone);
     }
 
-    const advanceSimulation = () => {
-        simulation.advanceWeek();
-        updateFreqGraphData(true);
-        updateSnowGraphData(true);
+    // --- event listeners ---
+
+    // sim control buttons
+    const advanceSimulation = (e) => {
+        if (advanceRateType === 'generations') {
+            let generations = 0;
+            while (generations < advanceRateValue) {
+                simulation.advanceWeek();
+                if (simulation.generationGenerator.shouldGenerate(simulation.week)) {
+                    generations++;
+                }
+                updateFreqGraphData();
+                updateSnowGraphData();
+            }
+            // advance one extra week so the generation can be seen in the graphs
+            simulation.advanceWeek();
+        } else {
+            let numWeeks = advanceRateValue;
+            if (advanceRateType === 'years') {
+                numWeeks *= 52;
+            }
+            for (let i = 0; i < numWeeks; i++) {
+                simulation.advanceWeek();
+                updateFreqGraphData();
+                updateSnowGraphData();
+            }
+        }
+        alleleLineChart.update();
+        snowLineChart.update();
         genotypeGrid.updateGrid();
     };
+
+    let runCount = 0;
+    const runSimulation = (e) => {
+        if (doEndCondition && runCount >= endConditionValue) {
+            // end condition reached
+            clearInterval(currentInterval);
+            currentInterval = null;
+            e.target.textContent = 'Play';
+            runCount = 0;
+        } else if (simulation.hares.length === 0) {
+            // no more hare generations remain
+            clearInterval(currentInterval);
+            currentInterval = null;
+            e.target.textContent = 'Play';
+            populationWiped = true;
+        } else {
+            advanceSimulation(e);
+            runCount++;
+        }
+    };
+
+    const toggleSimulation = (e) => {
+        if (currentInterval) {
+            clearInterval(currentInterval);
+            currentInterval = null;
+            e.target.textContent = 'Play';
+        } else {
+            currentInterval = setInterval(() => runSimulation(e), playRate);
+            e.target.textContent = 'Stop';
+        }
+    };
+
+    const resetSimulation = (e) => {
+        replaceSimulation();
+    };
+
+    document.getElementById('advance-button').addEventListener('click', advanceSimulation);
+    document.getElementById('play-button').addEventListener('click', toggleSimulation);
+    document.getElementById('reset-button').addEventListener('click', resetSimulation);
+    // graph buttons
 
     const toggleGraphStack = () => {
         alleleLineChart.options.scales.y.stacked = !alleleLineChart.options.scales.y.stacked;
@@ -392,30 +481,17 @@ function main() {
             snowLineChart = new Chart(document.getElementById('snow-chart'), makeSnowGraphWeeklyConfig());
         }
     }
-
-
-    document.getElementById('advance-week').addEventListener('click', advanceSimulation);
     document.getElementById('toggle-stack').addEventListener('click', toggleGraphStack);
-    document.getElementById('advance-10-years').addEventListener('click', () => {
-        for (let i = 0; i < 520; i++) {
-            simulation.advanceWeek();
-            updateFreqGraphData();
-            updateSnowGraphData();
-        }
-        alleleLineChart.update();
-        snowLineChart.update();
-        genotypeGrid.updateGrid();
-    });
     document.getElementById('toggle-snow-data').addEventListener('click', toggleSnowData);
 
     // --- form events ---
 
     // tie form submission to simulation update
 
-    const form = document.getElementById('config-form');
-    form.addEventListener('submit', (event) => {
+    const configForm = document.getElementById('config-form');
+    configForm.addEventListener('submit', (event) => {
         event.preventDefault();
-        const formData = new FormData(form);
+        const formData = new FormData(configForm);
         const carryingCapacity = parseInt(formData.get('carrying-capacity'));
         const baseSurvivalRate = parseFloat(formData.get('base-survival-rate'));
         const mismatchPenalty = parseFloat(formData.get('mismatch-penalty'));
@@ -431,8 +507,8 @@ function main() {
             selection,
             startWeek,
             availableAlleles: simulation.availableAlleles,
-            climateGenerator: new climateFunctions[climateFunctionKey].constructor(startWeek, 0),
-            generationGenerator: new generationFunctions[generationFunctionKey].constructor(startWeek),
+            climateGenerator: climateFunctionKey,
+            generationGenerator: generationFunctionKey,
         };
         currentConfig = newConfig;
         replaceSimulation()
@@ -444,12 +520,12 @@ function main() {
     });
 
     // if selection is not selected, disable the mismatch penalty input
-    form.elements['selection'].addEventListener('change', (event) => {
-        form.elements['mismatch-penalty'].disabled = !event.target.checked;
+    configForm.elements['selection'].addEventListener('change', (event) => {
+        configForm.elements['mismatch-penalty'].disabled = !event.target.checked;
     });
 
-    const climateSelect = form.elements['climate-function'];
-    const generationSelect = form.elements['generation-function'];
+    const climateSelect = configForm.elements['climate-function'];
+    const generationSelect = configForm.elements['generation-function'];
 
     for (const [key, value] of Object.entries(climateFunctions)) {
         const option = document.createElement('option');
@@ -464,6 +540,43 @@ function main() {
         option.textContent = value.constructor.name;
         generationSelect.appendChild(option);
     }
+
+    // --- form input events ---
+
+    const controlForm = document.getElementById('control-form');
+    // set the initial values for the form inputs
+    controlForm.querySelector('#advance-rate-value').value = advanceRateValue;
+    controlForm.querySelector('#advance-rate-type').value = advanceRateType;
+    controlForm.querySelector('#do-end-condition').checked = doEndCondition;
+    controlForm.querySelector('#end-condition-value').value = endConditionValue;
+    controlForm.querySelector('#play-rate').value = playRate;
+    controlForm.querySelector('#play-rate-output').value = playRate;
+
+    controlForm.querySelector('#advance-rate-value').addEventListener('input', (event) => {
+        advanceRateValue = parseInt(event.target.value);
+    });
+
+    controlForm.querySelector('#advance-rate-type').addEventListener('change', (event) => {
+        advanceRateType = event.target.value;
+    });
+
+    controlForm.querySelector('#do-end-condition').addEventListener('change', (event) => {
+        doEndCondition = event.target.checked;
+    });
+
+    controlForm.querySelector('#end-condition-value').addEventListener('input', (event) => {
+        endConditionValue = parseInt(event.target.value);
+    });
+
+    controlForm.querySelector('#play-rate').addEventListener('input', (event) => {
+        playRate = parseInt(event.target.value);
+        console.log(playRate);
+        if (currentInterval) {
+            clearInterval(currentInterval);
+            currentInterval = setInterval(() => runSimulation(event), playRate);
+        }
+    });
+
     // --- tab events ---
 
     const tabs = document.querySelectorAll('.tab');
