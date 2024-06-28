@@ -153,4 +153,18 @@ export class Hare {
         // determine if the hare survives, 1 will always survive
         return this.alive = Math.random() <= survivalRate;
     }
+
+    /**
+     * Determine if two hares are equal based on their properties (not their id)
+     * @param {Hare} hare - the hare to compare against
+     * @returns {boolean} true if the hares are equal, false otherwise
+     */
+    equals(hare) {
+        return (
+            this.alive === hare.alive &&
+            this.whiteness === hare.whiteness &&
+            this.alleles.length === hare.alleles.length &&
+            this.alleles.every((allele, index) => allele.id === hare.alleles[index].id)
+        )
+    }
 }
