@@ -67,6 +67,11 @@ export class Simulation {
          * @type {Array<number>}
          */
         this.availableIds = [];
+        /**
+         * The number of generations that have occurred in the simulation
+         * @type {number}
+         */
+        this.generation = 1;
 
         // disable penalty if simulationConfig.selection is false
         if (!simulationConfig.selection) {
@@ -122,6 +127,7 @@ export class Simulation {
             newHare.whiteness = newHare.getProjectedWhiteness(this.week);
             this.hares.push(newHare);
         }
+        this.generation++;
         return true;
     }
 
