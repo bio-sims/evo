@@ -17,7 +17,7 @@ class GenerateEvery18Weeks {
         this.week++;
     }
     shouldGenerate() {
-        return this.week % 18 === 0;
+        return this.week % 18 === 0 && this.week > 0;
     }
 }
 
