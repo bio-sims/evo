@@ -69,6 +69,7 @@ const makeAlleleGraphConfig = () => {
             datasets: alleleGraphDatasets,
         },
         options: {
+            animation: weekLabels.length < 512,
             responsive: true,
             maintainAspectRatio: false,
             scales: {
@@ -120,6 +121,7 @@ const makeSnowGraphWeeklyConfig = () =>  {
             ]
         },
         options: {
+            animation: weekLabels.length < 512,
             currentGraph: 'weekly',
             responsive: true,
             maintainAspectRatio: false,
@@ -166,6 +168,7 @@ const makeSnowGraphYearlyConfig = () => {
             ]
         },
         options: {
+            animation: weekLabels.length < 512,
             currentGraph: 'yearly',
             responsive: true,
             maintainAspectRatio: false,
@@ -200,7 +203,8 @@ const makeSnowGraphYearlyConfig = () => {
  * @type {Simulation|null}
 */
 let simulation = null;
-
+let currentTab = 'frequency-graph';
+let weatherBar = null;
 
 function graphSetup() {
     if (!simulation) return;
@@ -258,7 +262,11 @@ function updateLabels() {
     }
 }
 
+// TODO: lots of reused logic between graph updaters, consider abstracting
+
 function updateFreqGraphData(refresh = false) {
+    // only refresh if the tab is active
+    refresh = refresh && currentTab === 'frequency-graph';
     // add the current allele frequencies to the chart
     if (!simulation) return;
     updateLabels();
@@ -271,6 +279,7 @@ function updateFreqGraphData(refresh = false) {
         alleleLineChart.options.spanGaps = true;
         alleleLineChart.options.datasets.line.pointRadius = 0;
         alleleLineChart.options.elements.point.radius = 0;
+        alleleLineChart.options.animation = false;
     }
     if (refresh) {
         alleleLineChart.update();
@@ -278,6 +287,8 @@ function updateFreqGraphData(refresh = false) {
 }
 
 function updateSnowGraphData(refresh = false) {
+    // only refresh if the tab is active
+    refresh = refresh && currentTab === 'snow-graph';
     if (!simulation) return;
     updateLabels();
     rawSnowData.push(simulation.snowCoverage);
@@ -291,10 +302,27 @@ function updateSnowGraphData(refresh = false) {
         snowLineChart.options.spanGaps = true;
         snowLineChart.options.datasets.line.pointRadius = 0;
         snowLineChart.options.elements.point.radius = 0;
+        snowLineChart.options.animation = false;
     }
     if (refresh) {
         snowLineChart.update();
     }
+}
+
+function updateWeatherBar() {
+    if (!simulation) return;
+    weatherBar.style.backgroundColor = `hsla(37, 100%, ${30 + (70 * simulation.snowCoverage)}%, 1)`;
+    weatherBar.style.color = simulation.snowCoverage > 0.5 ? 'black' : 'white';
+    weatherBar.textContent = `Snow Coverage: ${Math.round(simulation.snowCoverage * 100)}%`;
+}
+
+function updateStatusPanel() {
+    if (!simulation) return;
+    document.getElementById('current-year-info').textContent = Math.floor(simulation.week / 52);
+    document.getElementById('current-week-info').textContent = simulation.week % 52;
+    document.getElementById('current-generation-info').textContent = simulation.generation;
+    document.getElementById('population-size-info').textContent = simulation.getAliveHares().length;
+    document.getElementById('snow-coverage-info').textContent = Math.round(simulation.snowCoverage * 100);
 }
 
 function replaceSimulation() {
@@ -321,6 +349,8 @@ function replaceSimulation() {
     genotypeGrid = new hareGrid(simulation, 'genotype-grid');
     graphSetup();
     genotypeGrid.updateGrid();
+    updateWeatherBar();
+    updateStatusPanel();
 }
 
 function updateScenario() {
@@ -357,6 +387,7 @@ function updateScenario() {
 }
 
 function main() {
+    weatherBar = document.getElementById('weather-bar');
     updateScenario();
 
     // define basic preset element
@@ -416,9 +447,17 @@ function main() {
                 updateSnowGraphData();
             }
         }
-        alleleLineChart.update();
-        snowLineChart.update();
-        genotypeGrid.updateGrid();
+        // update status panel
+        updateStatusPanel();
+
+        if (currentTab === 'frequency-graph') {
+            alleleLineChart.update();
+        } else if (currentTab === 'snow-graph') {
+            snowLineChart.update();
+        } else if (currentTab === 'hare-grid') {
+            genotypeGrid.updateGrid();
+            updateWeatherBar();
+        }
     };
 
     let runCount = 0;
@@ -453,6 +492,7 @@ function main() {
     };
 
     const resetSimulation = (e) => {
+        runCount = 0;
         replaceSimulation();
     };
 
@@ -489,9 +529,9 @@ function main() {
     // tie form submission to simulation update
 
     const configForm = document.getElementById('config-form');
-    configForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const formData = new FormData(configForm);
+    configForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
         const carryingCapacity = parseInt(formData.get('carrying-capacity'));
         const baseSurvivalRate = parseFloat(formData.get('base-survival-rate'));
         const mismatchPenalty = parseFloat(formData.get('mismatch-penalty'));
@@ -520,8 +560,8 @@ function main() {
     });
 
     // if selection is not selected, disable the mismatch penalty input
-    configForm.elements['selection'].addEventListener('change', (event) => {
-        configForm.elements['mismatch-penalty'].disabled = !event.target.checked;
+    configForm.elements['selection'].addEventListener('change', (e) => {
+        configForm.elements['mismatch-penalty'].disabled = !e.target.checked;
     });
 
     const climateSelect = configForm.elements['climate-function'];
@@ -552,28 +592,28 @@ function main() {
     controlForm.querySelector('#play-rate').value = playRate;
     controlForm.querySelector('#play-rate-output').value = playRate;
 
-    controlForm.querySelector('#advance-rate-value').addEventListener('input', (event) => {
-        advanceRateValue = parseInt(event.target.value);
+    controlForm.querySelector('#advance-rate-value').addEventListener('input', (e) => {
+        advanceRateValue = parseInt(e.target.value);
     });
 
-    controlForm.querySelector('#advance-rate-type').addEventListener('change', (event) => {
-        advanceRateType = event.target.value;
+    controlForm.querySelector('#advance-rate-type').addEventListener('change', (e) => {
+        advanceRateType = e.target.value;
     });
 
-    controlForm.querySelector('#do-end-condition').addEventListener('change', (event) => {
-        doEndCondition = event.target.checked;
+    controlForm.querySelector('#do-end-condition').addEventListener('change', (e) => {
+        doEndCondition = e.target.checked;
     });
 
-    controlForm.querySelector('#end-condition-value').addEventListener('input', (event) => {
-        endConditionValue = parseInt(event.target.value);
+    controlForm.querySelector('#end-condition-value').addEventListener('input', (e) => {
+        endConditionValue = parseInt(e.target.value);
     });
 
-    controlForm.querySelector('#play-rate').addEventListener('input', (event) => {
-        playRate = parseInt(event.target.value);
+    controlForm.querySelector('#play-rate').addEventListener('input', (e) => {
+        playRate = parseInt(e.target.value);
         console.log(playRate);
         if (currentInterval) {
             clearInterval(currentInterval);
-            currentInterval = setInterval(() => runSimulation(event), playRate);
+            currentInterval = setInterval(() => runSimulation(e), playRate);
         }
     });
 
@@ -594,6 +634,17 @@ function main() {
             activeTabContent.classList.remove('card--active');
             tab.classList.add('tab--active');
             tabContent.classList.add('card--active');
+
+            // update only the active tab content
+            currentTab = tab.dataset.tab;
+            if (currentTab === 'frequency-graph') {
+                alleleLineChart.update();
+            } else if (currentTab === 'snow-graph') {
+                snowLineChart.update();
+            } else if (currentTab === 'hare-grid') {
+                genotypeGrid.updateGrid();
+                updateWeatherBar();
+            }
         });
     }
 }

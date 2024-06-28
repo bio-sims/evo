@@ -248,31 +248,103 @@ article.genotype-grid {
     gap: 0.25rem;
     padding: 0.25rem;
     background-color: var(--cr-bg-secondary);
+    margin-bottom: 2rem;
 }
 
-article.genotype-grid .grid-hare {
-    min-width: 1.75rem;
-    min-height: 1.75rem;
+.grid-hare {
+    display: grid;
+    position: relative;
+    width: 2rem;
+    height: 2rem;
     border: 1px solid rgba(0, 0, 0, 0.30);
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    transition: all 0.15s ease-in-out;
+    z-index: 1;
+}
+
+.grid-hare > .tooltip {
+    position: absolute;
+    bottom: 0;
+    right: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
+    gap: 1rem;
+    opacity: 0;
+    user-select: none;
+    pointer-events: none;
+    background-color: var(--cr-bg-secondary);
+    color: var(--cr-text-primary);
+    border: 1px solid rgba(0, 0, 0, 0.30);
+    border-radius: var(--br-radius-small);
+    padding: 1rem;
+    transition: all 0.2s ease-in-out;
 }
 
-article.genotype-grid .grid-hare--mismatch::before {
-    content: "X";
-    color: var(--cr-warning);
-    font-weight: bold;
-    font-size: 1.25rem;
-    /* TODO: fix this shadow outline */
-    text-shadow:
-        0px 0px 1px #000,
-        -1px 1px 1px #000,
-        0px 0px 1px #000,
-        1px 0px 1px #000;
-    text-align: center;
+.grid-hare:hover {
+    z-index: 2;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.grid-hare:hover > .tooltip {
+    opacity: 1;
+    transform: translate3d(0, 100%, 0);
+}
+
+.tooltip > .tooltip-content {
+    display: flex;
+    flex-direction: column;
+    text-wrap: nowrap;
+}
+
+.grid-hare > .hare-allele {
+    transition: all 0.10s ease-in-out;
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+.grid-hare > .hare-whiteness {
+    transition: all 0.2s ease-in-out;
+    grid-row: span 2;
+}
+
+.grid-hare--mismatch {
+    border: 3px solid var(--cr-warning);
+    padding: 0.1rem;
+}
+
+.grid-hare--dead {
+    opacity: 0.15;
+}
+
+.grid-hare--dead .tooltip > .grid-hare {
+    opacity: 1;
+}
+
+
+.grid-hare--dead:hover {
+    opacity: 1;
+}
+
+.grid-hare--large {
+    width: 4rem;
+    height: 4rem;
 }
 
 #control-form {
     margin-bottom: 1rem;
+}
+
+#weather-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 25px;
+    border-radius: 25px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.20s ease-in-out;
+    font-weight: bold;
 }

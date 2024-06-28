@@ -21,6 +21,15 @@
     <main class="card-container">
         <!-- side cards -->
         <div class="card-panel card-panel--side">
+            <!-- TODO: Style and format these cards -->
+            <section class="card card--side" id="info-card">
+                <h1>Evo status</h1>
+                <h3>Current year: <span id="current-year-info">0</span></h3>
+                <h3>Week of the year: <span id="current-week-info">0</span></h3>
+                <h3>Current generation: <span id="current-generation-info">0</span></h3>
+                <h3>Population size: <span id="population-size-info">0</span></h3>
+                <h3>Snow coverage: <span id="snow-coverage-info">0</span>%</h3>
+            </section>
             <section class="card card--side" id="control-card">
                 <h1>Evo Controls</h1>
                 <form id="control-form">
@@ -118,6 +127,7 @@
                 </section>
                 <section class="card tab-content" id="hare-grid" data-group="main">
                     <article class="genotype-grid" id="genotype-grid"></article>
+                    <div id="weather-bar"></div>
                 </section>
                 <section class="card tab-content" id="snow-graph" data-group="main">
                     <div class="canvas">
