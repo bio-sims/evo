@@ -18,13 +18,10 @@ class IntegralStableClimate {
         this.baseSnowlessYearWeek = Math.floor(Math.random() * 8) + 21;
         this.currentSnowlessYearWeek = this.baseSnowlessYearWeek;
         this.snowWeek = 36;
+        this.updateTemperature();
     }
 
-    advanceWeek() {
-        this.week++;
-    }
-    
-    getSnowCoverage() {
+    updateTemperature() {
         const yearWeek = this.week % 52;
         // if start of year, choose a random week within a delta of 1 week of the base week
         if (yearWeek === 0) {
@@ -37,10 +34,15 @@ class IntegralStableClimate {
         } else {
             this.temperature = 10;
         }
-        if (this.temperature < 1) {
-            return 1;
-        }
-        return 0;
+    }
+
+    advanceWeek() {
+        this.week++;
+        this.updateTemperature();
+    }
+
+    getSnowCoverage() {
+        return this.temperature < 1 ? 1 : 0;
     }
 };
 
@@ -54,12 +56,43 @@ class IntegralVariableClimate {
     constructor(week, temperature) {
         this.week = week;
         this.temperature = temperature;
+        this.initialSnowlessYearWeek = Math.floor(Math.random() * 2) + 28;
+        this.currentSnowlessYearWeek = this.initialSnowlessYearWeek;
+        this.snowWeek = 36;
+        this.updateTemperature();
+    }
+    updateTemperature() {
+        const yearWeek = this.week % 52;
+        // choose a new snowless week if it is the start of the year
+        // have a 50% chance of changing the snowless week until the week has drifted to week 15
+        let changeChance;
+        if (this.currentSnowlessYearWeek < 15) {
+            changeChance = 0.25;
+        } else if (this.currentSnowlessYearWeek < 10) {
+            changeChance = 0.05;
+        } else {
+            changeChance = 0.5;
+        }
+        if (yearWeek === 0 && Math.random() < changeChance) {
+            // have a 20% chance of increasing the snowless week
+            if (Math.random() < 0.2) {
+                this.currentSnowlessYearWeek = Math.min(51, this.currentSnowlessYearWeek + 1);
+            } else {
+                this.currentSnowlessYearWeek = Math.max(0, this.currentSnowlessYearWeek - 1);
+            }
+        }
+        if (yearWeek < this.currentSnowlessYearWeek || yearWeek >= this.snowWeek) {
+            this.temperature = 0;
+        } else {
+            this.temperature = 10;
+        }
     }
     advanceWeek() {
         this.week++;
+        this.updateTemperature();
     }
     getSnowCoverage() {
-        return 0;
+        return this.temperature < 1 ? 1 : 0;
     }
 };
 
