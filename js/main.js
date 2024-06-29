@@ -214,10 +214,7 @@ function replaceSimulation() {
     for (const [key, value] of Object.entries(generationFunctions)) {
         generationFunctions[key] = new value.constructor(currentConfig.startWeek);
     }
-    // replace the climate and generation function strings with the actual objects
-    currentConfig.climateGenerator = climateFunctions[currentConfig.climateGenerator];
-    currentConfig.generationGenerator = generationFunctions[currentConfig.generationGenerator];
-    simulation = new Simulation(currentConfig);
+    simulation = new Simulation({ ...currentConfig, climateGenerator: climateFunctions[currentConfig.climateGenerator], generationGenerator: generationFunctions[currentConfig.generationGenerator] });
     window.simulation = simulation; // temp
     // initialize grid
     genotypeGrid = new hareGrid(simulation, 'genotype-grid');
