@@ -135,6 +135,8 @@ export class Simulation {
      * Advances the simulation by one week
      */
     advanceWeek() {
+        this.climateGenerator.advanceWeek();
+        this.generationGenerator.advanceWeek();
         this.snowCoverage = this.climateGenerator.getSnowCoverage();
         if (this.hares.length === 0) {
             this.week++;
@@ -152,8 +154,6 @@ export class Simulation {
             );
         });
         this.week++;
-        this.climateGenerator.advanceWeek();
-        this.generationGenerator.advanceWeek();
     }
 
     getPossibleCoatAlleles() {
