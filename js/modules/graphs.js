@@ -4,6 +4,15 @@
  * @module graphs
  */
 
+const displayWeek = (week, length) => {
+    if (length <= 52) {
+        return week;
+    }
+    const year = Math.floor(week / 52);
+    const weekOfYear = week % 52;
+    return `Yr${year} Wk${weekOfYear}`;
+};
+
 const makeAlleleGraphConfig = (weekLabels, alleleGraphDatasets, useGenerations, generationWeeks, useChartArea) => {
     for (const dataset of alleleGraphDatasets) {
         dataset.fill = useChartArea ? '-1' : false;
@@ -30,12 +39,7 @@ const makeAlleleGraphConfig = (weekLabels, alleleGraphDatasets, useGenerations, 
                             if (useGenerations) {
                                 return generationWeeks.includes(val) ? `Gen ${generationWeeks.indexOf(val) + 2}` : null;
                             }
-                            if (weekLabels.length <= 52) {
-                                return val;
-                            }
-                            const year = Math.floor(val / 52);
-                            const week = val % 52;
-                            return `Yr${year} Wk${week}`;
+                            return displayWeek(val, weekLabels.length);
                         },
                         maxTicksLimit: 10,
                     }
@@ -108,8 +112,17 @@ const makeSnowGraphConfig = (labels, rawSnowData, isYearly) => {
                 x: {
                     title: {
                         display: true,
-                        text: isYearly ? "Year" : "Week",
+                        text: isYearly ? "Simulation Year" : "Simulation Week",
                     },
+                    ticks: {
+                        callback: (val, index) => {
+                            if (isYearly) {
+                                return val;
+                            }
+                            return displayWeek(val, labels.length);
+                        },
+                        maxTicksLimit: 10,
+                    }
                 },
                 y: {
                     title: {
@@ -123,10 +136,12 @@ const makeSnowGraphConfig = (labels, rawSnowData, isYearly) => {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        title: (context) =>
-                            isYearly
-                                ? `Year ${context[0].label}`
-                                : `Week ${context[0].label}`,
+                        title: (context) => {
+                            if (isYearly) {
+                                return `Year ${context[0].label}`;
+                            }
+                            return `Year ${Math.floor(context[0].label / 52)} Week ${context[0].label % 52}`;
+                        }
                     },
                 },
             },
