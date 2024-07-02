@@ -26,6 +26,10 @@ const makeAlleleGraphConfig = (weekLabels, alleleGraphDatasets, useGenerations, 
         },
         options: {
             animation: weekLabels.length < 512,
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
             responsive: true,
             maintainAspectRatio: false,
             scales: {
@@ -106,6 +110,10 @@ const makeSnowGraphConfig = (labels, rawSnowData, isYearly) => {
         options: {
             animation: labels.length < 512,
             currentGraph: isYearly ? "yearly" : "weekly",
+            interaction: {
+                mode: "index",
+                intersect: false,
+            },
             responsive: true,
             maintainAspectRatio: false,
             scales: {

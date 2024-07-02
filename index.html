@@ -23,91 +23,146 @@
         <div class="card-panel card-panel--side">
             <!-- TODO: Style and format these cards -->
             <section class="card card--side" id="info-card">
-                <h1>Evo status</h1>
-                <h3>Current year: <span id="current-year-info">0</span></h3>
-                <h3>Week of the year: <span id="current-week-info">0</span></h3>
-                <h3>Current generation: <span id="current-generation-info">0</span></h3>
-                <h3>Population size: <span id="population-size-info">0</span></h3>
-                <h3>Snow coverage: <span id="snow-coverage-info">0</span>%</h3>
-            </section>
-            <section class="card card--side" id="control-card">
-                <h1>Evo Controls</h1>
+                <article class="status-panel">
+                    <h1>Evo Simulation</h1>
+                    <table id="simulation-info" class="info-table">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Week</th>
+                                <th>Generation</th>
+                                <th>Population</th>
+                                <th>Snow</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="current-year-info">0</td>
+                                <td id="current-week-info">0</td>
+                                <td id="current-generation-info">0</td>
+                                <td id="population-size-info">0</td>
+                                <td><span id="snow-coverage-info">0</span>%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
                 <form id="control-form">
                     <!-- Change rate of advancement -->
-                    <div class="input-group row">
-                        <label for="advance-rate-value">Advance every </label>
-                        <input type="number" id="advance-rate-value" name="advance-rate-value" value="1">
-                        <select id="advance-rate-type" name="advance-rate-type">
-                            <option value="weeks">weeks</option>
-                            <option value="generations">generations</option>
-                            <option value="years">years</option>
-                        </select>
+                    <div class="input-group">
+                        <div class="input-group-half">
+                            <label for="advance-rate-value">Advance every </label>
+                        </div>
+                        <div class="input-group-half right-align">
+                            <input type="number" id="advance-rate-value" name="advance-rate-value" value="1">
+                            <select id="advance-rate-type" name="advance-rate-type">
+                                <option value="weeks">weeks</option>
+                                <option value="generations">generations</option>
+                                <option value="years">years</option>
+                            </select>
+                        </div>
                     </div>
-                    <!-- Change end condition, choice between generation count or year/weeks, like "End after x generations" or "End after x years" -->
-                    <div class="input-group row">
-                        <input type="checkbox" id="do-end-condition" name="do-end-condition">
-                        <label for="end-condition-value">Stop playing after</label>
-                        <input type="number" id="end-condition-value" name="end-condition-value" value="10">
-                        <span>iterations</span>
+                    <div class="input-group" id="input-group-end-condition">
+                        <div class="input-group-half">
+                            <label for="end-condition-value">Stop playing after</label>
+                        </div>
+                        <div class="input-group-half right-align">
+                            <div class="annotated-input">
+                                <input type="number" id="end-condition-value" name="end-condition-value" value="10">
+                                <span>iterations</span>
+                            </div>
+                            <input type="checkbox" id="do-end-condition" name="do-end-condition">
+                        </div>
                     </div>
                     <!-- Change the speed of the simulation -->
                     <div class="input-group">
-                        <label for="play-rate">Playback speed</label>
-                        <input type="range" id="play-rate" name="play-rate" min="100" max="2500" step="10" value="1" oninput="this.nextElementSibling.firstElementChild.value = this.value">
-                        <div class="range-labels">
-                            <output for="play-rate" id="play-rate-output">1</output>
-                            <span>ms</span>
+                        <div class="input-group-half">
+                            <label for="play-rate">Playback speed</label>
+                        </div>
+                        <div class="input-group-half right-align">
+                                <input type="range" id="play-rate" name="play-rate" min="100" max="2500" step="10" value="1" oninput="this.nextElementSibling.firstElementChild.value = this.value">
+                                <div class="range-labels">
+                                    <output for="play-rate" id="play-rate-output">1</output>
+                                    <span>ms</span>
+                                </div>
                         </div>
                     </div>
                 </form>
-                <div class="buttons">
+                <div class="buttons buttons-center">
                     <button id="advance-button">Advance</button>
                     <button id="play-button">Play</button>
                     <button id="reset-button">Reset</button>
                 </div>
             </section>
-            <section class="card card--side" id="preset-card">
-                <h1>Preset Scenarios</h1>
+            <details open class="card card--side" id="preset-card">
+                <summary>Preset Scenarios</summary>
                 <div class="buttons" id="preset-container"></div>
-            </section>
-            <section class="card card--side" id="config-card">
-                <h1>Configuration</h1>
+            </details>
+            <details open class="card card--side" id="config-card">
+                <summary>Configuration</summary>
+                <p>Overwrite values set by the default scenarios using this panel. The configuration won&apos;t be in effect until you hit apply.</p>
                 <form id="config-form">
                     <div class="input-group">
-                        <label for="carrying-capacity">Carrying Capacity</label>
-                        <input type="number" id="carrying-capacity" name="carrying-capacity" value="100">
+                        <div class="input-group-half">
+                            <label for="carrying-capacity">Carrying Capacity</label>
+                        </div>
+                        <div class="input-group-half right-align">
+                            <input type="number" id="carrying-capacity" name="carrying-capacity" value="100">
+                        </div>
                     </div>
                     <div class="input-group range">
-                        <label for="base-survival-rate">Base Survival Rate</label>
-                        <input type="range" id="base-survival-rate" name="base-survival-rate" min="0" max="1" step="0.01" value="0.5" oninput="this.nextElementSibling.value = this.value">
-                        <output for="base-survival-rate" id="base-survival-rate-output">0.5</output>
-                    </div>
-                    <div class="input-group range">
-                        <label for="mismatch-penalty">Mismatch Penalty</label>
-                        <input type="range" id="mismatch-penalty" name="mismatch-penalty" min="0" max="1" step="0.01" value="0.5" oninput="this.nextElementSibling.value = this.value">
-                        <output for="mismatch-penalty" id="mismatch-penalty-output">0.5</output>
-                    </div>
-                    <div class="input-group">
-                        <label for="climate-function">Climate Function</label>
-                        <select id="climate-function" name="climate-function"></select>
+                        <div class="input-group-half">
+                            <label for="base-survival-rate">Base Survival Rate</label>
+                        </div>
+                        <div class="input-group-half">
+                            <div class="range-group">
+                                <input type="range" id="base-survival-rate" name="base-survival-rate" min="0" max="1" step="0.01" value="0.5" oninput="this.nextElementSibling.value = this.value">
+                                <output for="base-survival-rate" id="base-survival-rate-output">0.5</output>
+                            </div>
+                        </div>
                     </div>
                     <div class="input-group">
-                        <label for="generation-function">Generation Function</label>
-                        <select id="generation-function" name="generation-function"></select>
-                    </div>
-                    <div class="input-group">
-                        <label for="start-week">Start Week</label>
-                        <input type="number" id="start-week" name="start-week" value="0">
-                    </div>
-                    <div class="input-group row">
-                        <label for="selection">Do selection?</label>
+                        <label for="selection">Simulate Allele Selection</label>
                         <input type="checkbox" id="selection" name="selection" checked>
                     </div>
-                    <div class="input-group">
-                        <button type="submit">Apply</button>
+                    <div class="input-group range" id="input-group-mismatch-penalty">
+                        <div class="input-group-half">
+                            <label for="mismatch-penalty">Mismatch Penalty</label>
+                        </div>
+                        <div class="input-group-half">
+                            <div class="range-group">
+                                <input type="range" id="mismatch-penalty" name="mismatch-penalty" min="0" max="1" step="0.01" value="0.5" oninput="this.nextElementSibling.value = this.value">
+                                <output for="mismatch-penalty" id="mismatch-penalty-output">0.5</output>
+                            </div>
+                        </div>
                     </div>
+                    <div class="input-group">
+                        <div class="input-group-half">
+                            <label for="climate-function">Climate Function</label>
+                        </div>
+                        <div class="input-group-half">
+                            <select id="climate-function" name="climate-function"></select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-half">
+                            <label for="generation-function">Generation Function</label>
+                        </div>
+                        <div class="input-group-half">
+                            <select id="generation-function" name="generation-function"></select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-half">
+                            <label for="start-week">Start Week</label>
+                        </div>
+                        <div class="input-group-half right-align">
+                            <input type="number" id="start-week" name="start-week" value="0">
+                        </div>
+                    </div>
+                    <button type="submit">Apply</button>
+                    <p id="config-form-apply-msg" class="hidden">Apply to update the simulation's configuration.</p>
                 </form>
-            </section>
+            </details>
         </div>
         <!-- main card -->
         <div class="card-panel card-panel--main">
@@ -121,7 +176,7 @@
                     <div class="canvas">
                         <canvas id="allele-line-chart"></canvas>
                     </div>
-                    <div class="buttons">
+                    <div class="buttons graph-buttons">
                         <button id="toggle-stack" class="chart-button">Toggle Chart Area</button>
                         <button id="toggle-ticks" class="chart-button">Toggle Generation Ticks</button>
                     </div>
@@ -134,7 +189,7 @@
                     <div class="canvas">
                         <canvas id="snow-chart"></canvas>
                     </div>
-                    <div class="buttons">
+                    <div class="buttons graph-buttons">
                         <button id="toggle-snow-data">Toggle Snow Data</button>
                     </div>
                 </section>

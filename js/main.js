@@ -239,6 +239,7 @@ function updateScenario() {
     form.elements['base-survival-rate'].value = currentConfig.baseSurvivalRate;
     form.elements['mismatch-penalty'].value = currentConfig.mismatchPenalty;
     form.elements['selection'].checked = currentConfig.selection;
+    toggleInputGroup(document.getElementById('input-group-mismatch-penalty'), currentConfig.selection);
     form.elements['start-week'].value = currentConfig.startWeek;
 
     // set initial values for the output fields, will be properly updated on input change
@@ -255,6 +256,19 @@ function updateScenario() {
     climateSelect.selectedIndex = Array.from(climateSelect.options).findIndex((option) => option.value === scenarios[selectedScenarioIndex].options.climateGenerator);
     generationSelect.selectedIndex = Array.from(generationSelect.options).findIndex((option) => option.value === scenarios[selectedScenarioIndex].options.generationGenerator);
     replaceSimulation();
+}
+
+function toggleInputGroup(element, enabled) {
+    if (enabled) {
+        element.classList.remove('input-group--disabled');
+    } else {
+        element.classList.add('input-group--disabled');
+    }
+    for (const input of element.querySelectorAll('input')) {
+        if (input.type !== 'checkbox') {
+            input.disabled = !enabled;
+        }
+    }
 }
 
 function main() {
@@ -294,7 +308,7 @@ function main() {
     // --- event listeners ---
 
     // sim control buttons
-    const advanceSimulation = (e) => {
+    const advanceSimulation = (e, animate = true) => {
         if (advanceRateType === 'generations') {
             let generations = 0;
             while (generations < advanceRateValue) {
@@ -324,10 +338,19 @@ function main() {
         // update status panel
         updateStatusPanel();
 
+        // animate will be overwritten if animation is disabled on the graph itself
         if (currentTab === 'frequency-graph') {
-            alleleLineChart.update();
+            if (animate) {
+                alleleLineChart.update();
+            } else {
+                alleleLineChart.update('none');
+            }
         } else if (currentTab === 'snow-graph') {
-            snowLineChart.update();
+            if (animate) {
+                snowLineChart.update();
+            } else {
+                snowLineChart.update('none');
+            }
         } else if (currentTab === 'hare-grid') {
             genotypeGrid.updateGrid();
             updateWeatherBar();
@@ -349,7 +372,7 @@ function main() {
             e.target.textContent = 'Play';
             populationWiped = true;
         } else {
-            advanceSimulation(e);
+            advanceSimulation(e, false);
             runCount++;
         }
     };
@@ -409,13 +432,25 @@ function main() {
     document.getElementById('toggle-stack').addEventListener('click', toggleGraphStack);
     document.getElementById('toggle-ticks').addEventListener('click', toggleTickType);
     document.getElementById('toggle-snow-data').addEventListener('click', toggleSnowData);
-
+    
     // --- form events ---
+
+    // toggle input group disabled state
+
 
     // tie form submission to simulation update
     const configForm = document.getElementById('config-form');
+
+    // if any field changes, display a message informing the user to apply the changes
+    configForm.addEventListener('input', () => {
+        document.getElementById('config-form-apply-msg').classList.remove('hidden');
+    });
+
+
     configForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        // remove the apply message
+        document.getElementById('config-form-apply-msg').classList.add('hidden');
         const formData = new FormData(e.target);
         const carryingCapacity = parseInt(formData.get('carrying-capacity'));
         const baseSurvivalRate = parseFloat(formData.get('base-survival-rate'));
@@ -447,6 +482,7 @@ function main() {
     // if selection is not selected, disable the mismatch penalty input
     configForm.elements['selection'].addEventListener('change', (e) => {
         configForm.elements['mismatch-penalty'].disabled = !e.target.checked;
+        toggleInputGroup(document.getElementById('input-group-mismatch-penalty'), configForm.elements['selection'].checked);
     });
 
     const climateSelect = configForm.elements['climate-function'];
@@ -469,10 +505,12 @@ function main() {
     // --- form input events ---
 
     const controlForm = document.getElementById('control-form');
+    const inputGroupEndCondition = document.getElementById('input-group-end-condition');
     // set the initial values for the form inputs
     controlForm.querySelector('#advance-rate-value').value = advanceRateValue;
     controlForm.querySelector('#advance-rate-type').value = advanceRateType;
     controlForm.querySelector('#do-end-condition').checked = doEndCondition;
+    toggleInputGroup(inputGroupEndCondition, doEndCondition);
     controlForm.querySelector('#end-condition-value').value = endConditionValue;
     controlForm.querySelector('#play-rate').value = playRate;
     controlForm.querySelector('#play-rate-output').value = playRate;
@@ -487,6 +525,7 @@ function main() {
 
     controlForm.querySelector('#do-end-condition').addEventListener('change', (e) => {
         doEndCondition = e.target.checked;
+        toggleInputGroup(inputGroupEndCondition, doEndCondition);
     });
 
     controlForm.querySelector('#end-condition-value').addEventListener('input', (e) => {
