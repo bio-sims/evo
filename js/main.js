@@ -390,11 +390,7 @@ function updateScenario() {
  * @param {boolean} enabled - Whether the input group should be enabled
  */
 function toggleInputGroup(element, enabled) {
-    if (enabled) {
-        element.classList.remove('input-group--disabled');
-    } else {
-        element.classList.add('input-group--disabled');
-    }
+    element.classList.toggle('input-group--disabled', !enabled);
     for (const input of element.querySelectorAll('input')) {
         if (input.type !== 'checkbox') {
             input.disabled = !enabled;

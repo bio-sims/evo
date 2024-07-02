@@ -95,7 +95,7 @@ export default class Grid {
         this.updateGrid();
     }
     /**
-     * Updates internal state of the grid, but does not update the DOM
+     * Updates internal state of the grid to match the simulation state
      */
     doTick() {
         this.simulation.hares.forEach((hare) => {
@@ -110,7 +110,7 @@ export default class Grid {
         });
     }
     /**
-     * Update the grid with the current state of the simulation
+     * Update the grid display with the current internal state, NOT the simulation state
      */
     updateGrid() {
         Object.values(this.hares).forEach((storedHare) => {
@@ -120,25 +120,17 @@ export default class Grid {
             const secondAllele = hareElement.children[2];
             const whiteness = hareElement.children[1];
 
-            if (storedHare.alive) {
-                hareElement.classList.remove("grid-hare--dead");
-                let sortedAlleles = [...storedHare.alleles].sort((a, b) => a.id - b.id);
-                // set the background color of the alleles
-                firstAllele.style.backgroundColor = sortedAlleles[0].geneColor;
-                secondAllele.style.backgroundColor = sortedAlleles[1].geneColor;
-                // set the background color of the whiteness, between brown and white
-                whiteness.style.backgroundColor = `hsla(37, 100%, ${30 + (70 * storedHare.whiteness)}%, 1)`; // brown to white
-            } else {
-                hareElement.classList.add("grid-hare--dead");
-            }
+            let sortedAlleles = [...storedHare.alleles].sort((a, b) => a.id - b.id);
+            // set the background color of the alleles
+            firstAllele.style.backgroundColor = sortedAlleles[0].geneColor;
+            secondAllele.style.backgroundColor = sortedAlleles[1].geneColor;
+            // set the background color of the whiteness, between brown and white
+            whiteness.style.backgroundColor = `hsla(37, 100%, ${30 + (70 * storedHare.whiteness)}%, 1)`; // brown to white
+            // update the classes based on the state of the hare
+            hareElement.classList.toggle("grid-hare--dead", !storedHare.alive);
+            hareElement.classList.toggle("grid-hare--mismatch", storedHare.wasMismatched);
 
-            if (!storedHare.wasMismatched) {
-                hareElement.classList.remove("grid-hare--mismatch");
-            } else {
-                hareElement.classList.add("grid-hare--mismatch");
-            }
-
-            // if currently hovered during an update, send a mouseover event to update the tooltip
+            // if currently hovered during an update, send another mouseover event to update the tooltip
             if (hareElement.matches(":hover")) {
                 hareElement.dispatchEvent(new Event("mouseover"));
             }
