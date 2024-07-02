@@ -11,6 +11,7 @@
  */
 class GenerateEvery18Weeks {
     constructor(week) {
+        this.friendlyName = "Every 18 Weeks";
         this.week = week;
     }
     advanceWeek() {
