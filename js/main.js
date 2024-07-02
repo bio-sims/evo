@@ -219,7 +219,6 @@ function replaceSimulation() {
     // initialize grid
     genotypeGrid = new hareGrid(simulation, 'genotype-grid');
     graphSetup();
-    genotypeGrid.updateGrid();
     updateWeatherBar();
     updateStatusPanel();
 }
@@ -320,6 +319,7 @@ function main() {
                 simulation.advanceWeek();
                 updateFreqGraphData();
                 updateSnowGraphData();
+                genotypeGrid.doTick();
             }
         } else {
             let numWeeks = advanceRateValue;
@@ -333,6 +333,7 @@ function main() {
                 simulation.advanceWeek();
                 updateFreqGraphData();
                 updateSnowGraphData();
+                genotypeGrid.doTick();
             }
         }
         // update status panel
@@ -534,7 +535,6 @@ function main() {
 
     controlForm.querySelector('#play-rate').addEventListener('input', (e) => {
         playRate = parseInt(e.target.value);
-        console.log(playRate);
         if (currentInterval) {
             clearInterval(currentInterval);
             currentInterval = setInterval(() => runSimulation(e), playRate);

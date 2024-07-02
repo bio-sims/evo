@@ -72,7 +72,9 @@ export default class Grid {
             `;
             // for now, we can't tell if the hare died mismatched due to update suppression (or time "skips" as far as the grid is considered)
             if (hare.alive) {
-                tooltipContent.innerHTML += `<span><b>Mismatched:</b> ${hare.isMismatched(this.simulation.snowCoverage) ? "Yes" : "No"}</span>`
+                tooltipContent.innerHTML += `<span><b>Mismatched:</b> ${hare.isMismatched(this.simulation.snowCoverage) ? "Yes" : "No"}</span>`;
+            } else {
+                tooltipContent.innerHTML += `<span><b>Died mismatched:</b> ${hare.wasMismatched ? "Yes" : "No"}</span>`;
             }
         });
         return element;
@@ -89,54 +91,57 @@ export default class Grid {
             const hareElement = this.makeHareElement(i);
             this.container.appendChild(hareElement);
         }
+        this.doTick();
+        this.updateGrid();
+    }
+    /**
+     * Updates internal state of the grid, but does not update the DOM
+     */
+    doTick() {
+        this.simulation.hares.forEach((hare) => {
+            const oldHare = this.hares[hare.id];
+            if (oldHare && hare.equals(oldHare) && oldHare.wasMismatched === hare.isMismatched(this.simulation.snowCoverage)) {
+                return;
+            }
+            let hareCopy = Object.assign(Object.create(Object.getPrototypeOf(hare)), hare);
+            hareCopy.wasMismatched = hare.isMismatched(this.simulation.snowCoverage);
+            hareCopy.shouldUpdate = true;
+            this.hares[hare.id] = hareCopy;
+        });
     }
     /**
      * Update the grid with the current state of the simulation
      */
     updateGrid() {
-        // use the hare id as the index for the grid
-        if (!this.simulation.hares) {
-            return;
-        }
-        this.simulation.hares.forEach((hare) => {
-            // do not update if the hare has not changed, saves on performance from DOM manipulation
-            const oldHare = this.hares[hare.id];
-            if (oldHare && hare.equals(oldHare) && oldHare.wasMismatched === hare.isMismatched(this.simulation.snowCoverage)) {
-                return;
-            }
-            // consider using querySelector instead of children if additional elements are added later
-            const hareElement = this.container.children[hare.id];
+        Object.values(this.hares).forEach((storedHare) => {
+            if (!storedHare.shouldUpdate) return;
+            const hareElement = this.container.children[storedHare.id];
             const firstAllele = hareElement.children[0];
             const secondAllele = hareElement.children[2];
             const whiteness = hareElement.children[1];
-            const tooltip = hareElement.children[3];
 
-            if (hare.alive) {
+            if (storedHare.alive) {
                 hareElement.classList.remove("grid-hare--dead");
-                let sortedAlleles = [...hare.alleles].sort((a, b) => a.id - b.id);
+                let sortedAlleles = [...storedHare.alleles].sort((a, b) => a.id - b.id);
                 // set the background color of the alleles
                 firstAllele.style.backgroundColor = sortedAlleles[0].geneColor;
                 secondAllele.style.backgroundColor = sortedAlleles[1].geneColor;
                 // set the background color of the whiteness, between brown and white
-                whiteness.style.backgroundColor = `hsla(37, 100%, ${30 + (70 * hare.whiteness)}%, 1)`; // brown to white
-
-                if (hare.isMismatched(this.simulation.snowCoverage)) {
-                    hareElement.classList.add("grid-hare--mismatch");
-                } else {
-                    hareElement.classList.remove("grid-hare--mismatch");
-                }
+                whiteness.style.backgroundColor = `hsla(37, 100%, ${30 + (70 * storedHare.whiteness)}%, 1)`; // brown to white
             } else {
-                hareElement.classList.remove("grid-hare--mismatch");
                 hareElement.classList.add("grid-hare--dead");
             }
+
+            if (!storedHare.wasMismatched) {
+                hareElement.classList.remove("grid-hare--mismatch");
+            } else {
+                hareElement.classList.add("grid-hare--mismatch");
+            }
+
             // if currently hovered during an update, send a mouseover event to update the tooltip
             if (hareElement.matches(":hover")) {
                 hareElement.dispatchEvent(new Event("mouseover"));
             }
-            // deep copy the hare, for some reason this is a pain in JS with classes
-            let hareCopy = Object.assign(Object.create(Object.getPrototypeOf(hare)), hare);
-            hareCopy.wasMismatched = hare.isMismatched(this.simulation.snowCoverage);
-            this.hares[hare.id] = hareCopy;
         });
     }
 }
