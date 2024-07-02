@@ -492,14 +492,14 @@ function main() {
     for (const [key, value] of Object.entries(climateFunctions)) {
         const option = document.createElement('option');
         option.value = key;
-        option.textContent = value.constructor.name;
+        option.textContent = value.friendlyName;
         climateSelect.appendChild(option);
     }
 
     for (const [key, value] of Object.entries(generationFunctions)) {
         const option = document.createElement('option');
         option.value = key;
-        option.textContent = value.constructor.name;
+        option.textContent = value.friendlyName;
         generationSelect.appendChild(option);
     }
 

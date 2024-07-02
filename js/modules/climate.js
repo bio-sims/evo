@@ -14,6 +14,7 @@ class IntegralStableClimate {
     constructor(week, temperature) {
         this.week = week;
         this.temperature = temperature;
+        this.friendlyName = "Integral Stable";
         // random number between 21 and 28
         this.baseSnowlessYearWeek = Math.floor(Math.random() * 8) + 21;
         this.currentSnowlessYearWeek = this.baseSnowlessYearWeek;
@@ -56,6 +57,7 @@ class IntegralVariableClimate {
     constructor(week, temperature) {
         this.week = week;
         this.temperature = temperature;
+        this.friendlyName = "Integral Variable";
         this.initialSnowlessYearWeek = Math.floor(Math.random() * 2) + 28;
         this.currentSnowlessYearWeek = this.initialSnowlessYearWeek;
         this.snowWeek = 36;
