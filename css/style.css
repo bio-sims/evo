@@ -12,7 +12,8 @@
     --cr-text-contrast: rgb(255, 255, 255);
     --cr-bg-primary: rgb(245, 245, 245);
     --cr-bg-secondary: rgb(255, 255, 255);
-    --cr-accent: rgb(144, 0, 255);
+    --cr-bg-contrast: rgb(212, 212, 212);
+    --cr-accent: rgb(168, 54, 255);
     --cr-button: rgb(0, 0, 0);
     --br-radius-small: 0.25rem;
     --cr-warning: rgb(255, 0, 0);
@@ -35,16 +36,16 @@ button {
     cursor: pointer;
     font-size: 1.25rem;
     transition: all 0.20s ease-in-out;
+}
 
-    &:hover {
-        background-color: var(--cr-accent);
-    }
+button:hover {
+    background-color: var(--cr-accent);
+}
 
-    &:disabled {
-        background-color: var(--cr-bg-secondary);
-        color: var(--cr-text-grey);
-        cursor: not-allowed;
-    }
+button:disabled {
+    background-color: var(--cr-bg-secondary);
+    color: var(--cr-text-grey);
+    cursor: not-allowed;
 }
 
 body {
@@ -82,28 +83,27 @@ nav > ul {
     list-style-type: none;
     gap: 2rem;
     height: 100%;
+}
 
-    & > li {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 6rem;
-        height: 100%;
-        padding: 0.5rem;
-        transition: all 0.10s ease-in-out;
+nav > ul > li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 6rem;
+    height: 100%;
+    padding: 0.5rem;
+    transition: all 0.10s ease-in-out;
+}
 
-        &:hover {
-            background-color: var(--cr-accent);
-            color: var(--cr-text-contrast);
-            cursor: pointer;
-        }
+nav > ul > li:hover {
+    background-color: var(--cr-accent);
+    color: var(--cr-text-contrast);
+    cursor: pointer;
+}
 
-        & > a {
-            text-decoration: none;
-            color: var(--text-primary);
-            font-size: 1.25rem;
-        }
-    }
+nav > ul > li > a {
+    text-decoration: none;
+    font-size: 1.25rem;
 }
 
 main.card-container {
@@ -116,6 +116,18 @@ main.card-container {
     gap: 1rem;
 }
 
+@media (max-width: 1200px) {
+    main.card-container {
+        flex-direction: column-reverse;
+    }
+}
+
+@media (width > 1200px) {
+    main.card-container {
+        flex-direction: row;
+    }
+}
+
 main.card-container .card-panel {
     display: flex;
     flex-direction: column;
@@ -126,10 +138,16 @@ main.card-container .card-panel {
 }
 
 main.card-container .card-panel--main {
-    min-width: 65vw;
+    min-width: 60vw;
 }
 
-main.card-container section.card {
+@media (min-width: 1450px) {
+    main.card-container .card-panel--main {
+        min-width: 65vw;
+    }
+}
+
+main.card-container .card {
     position: relative;
     display: flex;
     padding: 2rem;
@@ -139,10 +157,43 @@ main.card-container section.card {
     border-radius: var(--br-radius-small);
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
     overflow: visible;
+}
 
-    & > h1 {
-        margin-bottom: 1rem;
-    }
+.card > h1 {
+    margin-bottom: 1rem;
+}
+
+article h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+details > summary {
+    cursor: pointer;
+    margin-bottom: 0;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+details[open] > summary {
+    margin-bottom: 1rem;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.info-table th {
+    background-color: var(--cr-bg-primary);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
+}
+
+.info-table td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.5rem;
 }
 
 .card .buttons {
@@ -152,6 +203,16 @@ main.card-container section.card {
     justify-content: flex-start;
     align-items: center;
     gap: 1rem;
+}
+
+.card .buttons-center {
+    gap: 0;
+    justify-content: center;
+}
+
+.card .graph-buttons {
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .card-panel > .card.card-tabs {
@@ -201,6 +262,10 @@ main.card-container section.card {
     display: flex;
 }
 
+.tab-content {
+    gap: 1rem;
+}
+
 #preset-container {
     display: flex;
     flex-direction: column;
@@ -212,7 +277,12 @@ main.card-container section.card {
 #preset-container > .preset-entry {
     width: 100%;
     padding: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     cursor: pointer;
+}
+
+#preset-container > .preset-entry:last-of-type {
+    border-bottom: none;
 }
 
 #preset-container > .preset-entry--selected {
@@ -224,20 +294,171 @@ main.card-container section.card {
 form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+}
+
+.card > p {
+    margin-bottom: 1.0rem;
+}
+
+p.hidden {
+    display: none;
+}
+
+#config-form-apply-msg {
+    margin-top: 1rem;
+    text-align: center;
+    color: var(--cr-warning);
 }
 
 form > .input-group {
     display: flex;
-    flex-direction: column;
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.5rem;
 
-    &.row {
-        flex-direction: row;
-    }
-    & output {
-        display: inline-block;
-    }
+    min-height: 4rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 0;
+}
+
+.input-group--disabled *:not(input[type="checkbox"]) {
+    opacity: 0.5;
+}
+
+form > .input-group:last-of-type {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+}
+
+form > .input-group output {
+    display: inline-block;
+}
+
+.input-group-half {
+    gap: 0.5rem;
+    width: 50%;
+}
+
+.input-group-half.right-align {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.range-labels {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    width: 6rem;
+}
+
+.annotated-input {
+    display: flex;
+    flex: 1;
+    width: 50%;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.input-group-half.space-align {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.input-group-half.space-align input[type="number"] {
+    width: 100%;
+}
+
+select, input[type="number"] {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--br-radius-small);
+    background-color: var(--cr-bg-primary);
+    color: var(--cr-text-primary);
+    font-size: 1rem;
+    transition: all 0.20s ease-in-out;
+}
+
+select:focus, input[type="number"]:focus {
+    background-color: var(--cr-bg-secondary);
+}
+
+input[type="number"] {
+    width: 50%;
+}
+
+input[type="range"] {
+    width: 100%;
+}
+
+input[type="checkbox"] {
+    position: relative;
+    overflow: hidden;
+    appearance: none;
+    height: 2rem;
+    width: 3.5rem;
+    border-radius: 50px;
+    outline: none;
+    border: none;
+    background-color: var(--cr-bg-contrast);
+    transition: all ease-in-out 0.2s;
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--cr-accent);
+}
+
+input[type="checkbox"]::before {
+    content: "";
+    position: absolute;
+    top: 0.25rem;
+    left: 0.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: all cubic-bezier(0.3, 1.5, 0.7, 1) 0.3s;
+    z-index: 2;
+}
+
+input[type="checkbox"]:checked::before {
+    transform: translateX(1.5rem);
+}
+
+input[type="checkbox"]:disabled {
+    background-color: #D1D1D6;
+}
+
+input[type="checkbox"]:disabled::before {
+    background-color: #8E8E93;
+}
+
+input[type="range"] {
+    accent-color: var(--cr-accent);
+}
+
+label {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+#control-form > .input-group:first-child {
+    border-top: none;
+}
+
+#control-form select {
+    width: 65%;
+}
+
+#control-form input[type="number"] {
+    width: 30%;
 }
 
 article.genotype-grid {
@@ -331,10 +552,6 @@ article.genotype-grid {
 .grid-hare--large {
     width: 4rem;
     height: 4rem;
-}
-
-#control-form {
-    margin-bottom: 1rem;
 }
 
 #weather-bar {
