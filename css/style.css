@@ -152,7 +152,7 @@ main.card-container .card-panel--main {
         position: sticky;
         top: 1rem;
         align-self: flex-start;
-        overflow-y: auto;
+        overflow-y: visible;
     }
 }
 
