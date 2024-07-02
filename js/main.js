@@ -14,16 +14,23 @@ import { IntegralStableClimate, IntegralVariableClimate } from "./modules/climat
 import { GenerateEvery18Weeks } from "./modules/generation.js";
 import hareGrid from "./modules/grid.js";
 
-function getColorHue(index) {
-    return (index / simulation.availableAlleles.length) * 360;
-}
-
 // --- module scoped variables ---
 
+/**
+ * The available allele sets from the configuration file
+ * @type {Object<string, Object[]>}
+ */
 let alleleSets = configFile.alleleSets;
+/**
+ * The available scenarios from the configuration file
+ * @type {Object[]}
+ */
 let scenarios = configFile.scenarios;
+/**
+ * The index of the currently selected preset scenario
+ * @type {number}
+ */
 let selectedScenarioIndex = 0;
-// copy with spread operator to avoid modifying the original
 let climateFunctions = {
     IntegralStableClimate: new IntegralStableClimate(0, 0),
     IntegralVariableClimate: new IntegralVariableClimate(0, 0),
@@ -31,6 +38,7 @@ let climateFunctions = {
 let generationFunctions = {
     GenerationEvery18Weeks: new GenerateEvery18Weeks(0),
 }
+// copy with spread operator to avoid modifying the original
 let currentConfig = { ...scenarios[selectedScenarioIndex].options };
 // replace any string names in scenario's available alleles with the actual objects
 for (const scenario of scenarios) {
@@ -42,39 +50,135 @@ for (const scenario of scenarios) {
 // --- chart.js global configuration ---
 Chart.defaults.elements.point.hitRadius = 8;
 
-// globals related to simulation control
+// --- globals related to simulation control ---
 
+/**
+ * The number of weeks to advance the simulation by
+ * @type {number}
+ */
 let advanceRateValue = 1;
+/**
+ * The type of advance rate
+ * @type {'weeks'|'generations'|'years'}
+ */
 let advanceRateType = 'weeks';
+/**
+ * Holds current interval ID for the simulation
+ * @type {number|null}
+ */
 let currentInterval = null;
+/**
+ * Whether the population has been wiped out
+ * @type {boolean}
+ * @todo unused
+ */
 let populationWiped = false;
+/**
+ * Whether to use an end condition for the interval
+ * @type {boolean}
+ */
 let doEndCondition = false;
+/**
+ * The number of advances to make before stopping the interval
+ * @type {number}
+ */
 let endConditionValue = 1;
+/**
+ * The rate at which the simulation advances in milliseconds
+ * @type {number}
+ */
 let playRate = 250;
 
-// graph related data initialization
+// --- graph related data initialization ---
 
+/**
+ * The current simulation week labels for the allele frequency graph
+ * @type {number[]}
+ */
 let weekLabels = Array.from({ length: 52 }, (_, i) => i);
+/**
+ * The current simulation year labels for the snow coverage graph
+ * @type {number[]}
+ */
 let yearLabels = Array.from({ length: 10 }, (_, i) => i);
+/**
+ * The weeks where a new generation was generated
+ * @type {number[]}
+ */
 let newGenerationWeeks = [];
+/**
+ * Whether to display the snow graph yearly or weekly
+ * @type {boolean}
+ */
 let isSnowLineChartYearly = true;
+/**
+ * If the graph gridmarks should be per generation or per week
+ * @type {boolean}
+ */
 let isAlleleGraphPerGeneration = false;
+/**
+ * If the graph should be stacked or not
+ * @type {boolean}
+ */
 let isAlleleGraphArea = false;
+/**
+ * The raw allele frequency data for the allele graph
+ * @type {Object[]}
+ */
 let alleleGraphDatasets = [];
+/**
+ * The raw snow coverage data for the snow graph per week
+ * @type {number[]}
+ */
 let rawSnowData = [];
+/**
+ * The first week of snowless coverage for each year
+ * @type {number[]}
+ */
 let rawFirstSnowlessWeekData = [];
 
+/**
+ * The chart object for displaying the allele frequencies
+ * @type {Chart|null}
+ */
 let alleleLineChart = null;
+/**
+ * The chart object for displaying the snow coverage
+ * @type {Chart|null}
+ */
 let snowLineChart = null;
+/**
+ * The main simulation grid display
+ * @type {hareGrid|null}
+ */
 let genotypeGrid = null;
-
 /**
  * @type {Simulation|null}
 */
 let simulation = null;
+/**
+ * id of the currently active tab
+ * @type {string}
+ */
 let currentTab = 'frequency-graph';
+/**
+ * The weather bar element
+ * @type {HTMLElement|null}
+ */
 let weatherBar = null;
 
+/**
+ * Returns the default hue value for a given index in the available alleles array
+ * @param {number} index - The allele index
+ * @returns {number} The hue value
+ */
+function getColorHue(index) {
+    return (index / simulation.availableAlleles.length) * 360;
+}
+
+/**
+ * Creates new graphs that are initialized/zeroed at the current simulation week
+ */
 function graphSetup() {
     if (!simulation) return;
     // set 52 weeks from the current week as the initial
@@ -120,6 +224,9 @@ function graphSetup() {
     snowLineChart = new Chart(snowCtx, graphConfig);
 }
 
+/**
+ * Updates the global labels for the graphs
+ */
 function updateLabels() {
     if (!simulation) return;
     const currentWeek = simulation.week;
@@ -136,8 +243,23 @@ function updateLabels() {
     }
 }
 
-// TODO: lots of reused logic between graph updaters, consider abstracting
+/**
+ * Optimizes the chart for performance if it exceeds a certain threshold
+ * @param {Chart} chart - The chart to optimize
+ */
+function optimizeChart(chart) {
+    if (chart.data.labels.length > 512) {
+        chart.options.spanGaps = true;
+        chart.options.datasets.line.pointRadius = 0;
+        chart.options.elements.point.radius = 0;
+        chart.options.animation = false;
+    }
+}
 
+/**
+ * Updates the allele frequency graph data with the current allele frequencies
+ * @param {boolean} refresh - Whether to refresh/display the graph changes immediately
+ */
 function updateFreqGraphData(refresh = false) {
     // only refresh if the tab is active
     refresh = refresh && currentTab === 'frequency-graph';
@@ -148,18 +270,16 @@ function updateFreqGraphData(refresh = false) {
     for (const dataset of alleleGraphDatasets) {
         dataset.data.push(currentFrequency[dataset.id]);
     }
-    // dont render points beyond a certain threshold to aid performance
-    if (alleleLineChart.data.labels.length > 512) {
-        alleleLineChart.options.spanGaps = true;
-        alleleLineChart.options.datasets.line.pointRadius = 0;
-        alleleLineChart.options.elements.point.radius = 0;
-        alleleLineChart.options.animation = false;
-    }
+    optimizeChart(alleleLineChart);
     if (refresh) {
         alleleLineChart.update();
     }
 }
 
+/**
+ * Updates the snow coverage graph data with the current snow coverage
+ * @param {boolean} refresh - Whether to refresh/display the graph changes immediately
+ */
 function updateSnowGraphData(refresh = false) {
     // only refresh if the tab is active
     refresh = refresh && currentTab === 'snow-graph';
@@ -172,17 +292,15 @@ function updateSnowGraphData(refresh = false) {
     if (simulation.snowCoverage === 0 && rawFirstSnowlessWeekData.length < year + 1) {
         rawFirstSnowlessWeekData.push(week);
     }
-    if (snowLineChart.data.labels.length > 512) {
-        snowLineChart.options.spanGaps = true;
-        snowLineChart.options.datasets.line.pointRadius = 0;
-        snowLineChart.options.elements.point.radius = 0;
-        snowLineChart.options.animation = false;
-    }
+    optimizeChart(snowLineChart);
     if (refresh) {
         snowLineChart.update();
     }
 }
 
+/**
+ * Updates the weather bar with the current snow coverage
+ */
 function updateWeatherBar() {
     if (!simulation) return;
     weatherBar.style.backgroundColor = `hsla(37, 100%, ${30 + (70 * simulation.snowCoverage)}%, 1)`;
@@ -190,6 +308,9 @@ function updateWeatherBar() {
     weatherBar.textContent = `Snow Coverage: ${Math.round(simulation.snowCoverage * 100)}%`;
 }
 
+/**
+ * Updates the status panel with the current simulation information
+ */
 function updateStatusPanel() {
     if (!simulation) return;
     document.getElementById('current-year-info').textContent = Math.floor(simulation.week / 52);
@@ -199,6 +320,9 @@ function updateStatusPanel() {
     document.getElementById('snow-coverage-info').textContent = Math.round(simulation.snowCoverage * 100);
 }
 
+/**
+ * Replaces/resets the current simulation with a new one based on the current configuration
+ */
 function replaceSimulation() {
     // clear interval if it exists, update pause button text
     if (currentInterval) {
@@ -223,6 +347,9 @@ function replaceSimulation() {
     updateStatusPanel();
 }
 
+/**
+ * Resets and reinitializes the simulation with the currently selected scenario
+ */
 function updateScenario() {
     // recreate the dependencies since they may have random elements or be startweek dependent
     for (const [key, value] of Object.entries(climateFunctions)) {
@@ -257,6 +384,11 @@ function updateScenario() {
     replaceSimulation();
 }
 
+/**
+ * Toggles the disabled state of an input group
+ * @param {HTMLElement} element - The input group element to toggle
+ * @param {boolean} enabled - Whether the input group should be enabled
+ */
 function toggleInputGroup(element, enabled) {
     if (enabled) {
         element.classList.remove('input-group--disabled');
@@ -270,6 +402,64 @@ function toggleInputGroup(element, enabled) {
     }
 }
 
+/**
+ * Advances the simulation by the current advance rate
+ * @param {bool} animate - Whether to animate the graph update, may be overridden by the graph itself
+ */
+function advanceSimulation(animate = true) {
+    if (advanceRateType === 'generations') {
+        let generations = 0;
+        while (generations < advanceRateValue) {
+            // check if the next advance will generate a new generation
+            if (simulation.generationGenerator.shouldGenerate(simulation.week)) {
+                newGenerationWeeks.push(simulation.week);
+                generations++;
+            }
+            simulation.advanceWeek();
+            updateFreqGraphData();
+            updateSnowGraphData();
+            genotypeGrid.doTick();
+        }
+    } else {
+        let numWeeks = advanceRateValue;
+        if (advanceRateType === 'years') {
+            numWeeks *= 52;
+        }
+        for (let i = 0; i < numWeeks; i++) {
+            if (simulation.generationGenerator.shouldGenerate(simulation.week)) {
+                newGenerationWeeks.push(simulation.week);
+            }
+            simulation.advanceWeek();
+            updateFreqGraphData();
+            updateSnowGraphData();
+            genotypeGrid.doTick();
+        }
+    }
+    // update status panel
+    updateStatusPanel();
+
+    // animate will be overwritten if animation is disabled on the graph itself
+    if (currentTab === 'frequency-graph') {
+        if (animate) {
+            alleleLineChart.update();
+        } else {
+            alleleLineChart.update('none');
+        }
+    } else if (currentTab === 'snow-graph') {
+        if (animate) {
+            snowLineChart.update();
+        } else {
+            snowLineChart.update('none');
+        }
+    } else if (currentTab === 'hare-grid') {
+        genotypeGrid.updateGrid();
+        updateWeatherBar();
+    }
+};
+
+/**
+ * Logic entry point for the simulation application, mostly setting up the DOM and event listeners
+ */
 function main() {
     weatherBar = document.getElementById('weather-bar');
     updateScenario();
@@ -304,60 +494,14 @@ function main() {
         presetsContainer.appendChild(presetClone);
     }
 
-    // --- event listeners ---
+    // --- button event listeners ---
 
-    // sim control buttons
-    const advanceSimulation = (e, animate = true) => {
-        if (advanceRateType === 'generations') {
-            let generations = 0;
-            while (generations < advanceRateValue) {
-                // check if the next advance will generate a new generation
-                if (simulation.generationGenerator.shouldGenerate(simulation.week)) {
-                    newGenerationWeeks.push(simulation.week);
-                    generations++;
-                }
-                simulation.advanceWeek();
-                updateFreqGraphData();
-                updateSnowGraphData();
-                genotypeGrid.doTick();
-            }
-        } else {
-            let numWeeks = advanceRateValue;
-            if (advanceRateType === 'years') {
-                numWeeks *= 52;
-            }
-            for (let i = 0; i < numWeeks; i++) {
-                if (simulation.generationGenerator.shouldGenerate(simulation.week)) {
-                    newGenerationWeeks.push(simulation.week);
-                }
-                simulation.advanceWeek();
-                updateFreqGraphData();
-                updateSnowGraphData();
-                genotypeGrid.doTick();
-            }
-        }
-        // update status panel
-        updateStatusPanel();
+    // simulation control button events
 
-        // animate will be overwritten if animation is disabled on the graph itself
-        if (currentTab === 'frequency-graph') {
-            if (animate) {
-                alleleLineChart.update();
-            } else {
-                alleleLineChart.update('none');
-            }
-        } else if (currentTab === 'snow-graph') {
-            if (animate) {
-                snowLineChart.update();
-            } else {
-                snowLineChart.update('none');
-            }
-        } else if (currentTab === 'hare-grid') {
-            genotypeGrid.updateGrid();
-            updateWeatherBar();
-        }
-    };
-
+    /**
+     * The number of times the simulation has run in the current interval
+     * @type {number}
+     */
     let runCount = 0;
     const runSimulation = (e) => {
         if (doEndCondition && runCount >= endConditionValue) {
@@ -373,7 +517,7 @@ function main() {
             e.target.textContent = 'Play';
             populationWiped = true;
         } else {
-            advanceSimulation(e, false);
+            advanceSimulation(false);
             runCount++;
         }
     };
@@ -389,7 +533,7 @@ function main() {
         }
     };
 
-    const resetSimulation = (e) => {
+    const resetSimulation = () => {
         runCount = 0;
         replaceSimulation();
     };
@@ -398,7 +542,7 @@ function main() {
     document.getElementById('play-button').addEventListener('click', toggleSimulation);
     document.getElementById('reset-button').addEventListener('click', resetSimulation);
 
-    // graph buttons
+    // graph button events
 
     const remakeAlleleGraph = () => {
         alleleLineChart.destroy();
@@ -433,11 +577,8 @@ function main() {
     document.getElementById('toggle-stack').addEventListener('click', toggleGraphStack);
     document.getElementById('toggle-ticks').addEventListener('click', toggleTickType);
     document.getElementById('toggle-snow-data').addEventListener('click', toggleSnowData);
-    
-    // --- form events ---
 
-    // toggle input group disabled state
-
+    // --- config form events ---
 
     // tie form submission to simulation update
     const configForm = document.getElementById('config-form');
@@ -447,29 +588,22 @@ function main() {
         document.getElementById('config-form-apply-msg').classList.remove('hidden');
     });
 
-
+    // apply the changes to the simulation when the form is submitted
     configForm.addEventListener('submit', (e) => {
         e.preventDefault();
         // remove the apply message
         document.getElementById('config-form-apply-msg').classList.add('hidden');
+        // put form data into a new config object
         const formData = new FormData(e.target);
-        const carryingCapacity = parseInt(formData.get('carrying-capacity'));
-        const baseSurvivalRate = parseFloat(formData.get('base-survival-rate'));
-        const mismatchPenalty = parseFloat(formData.get('mismatch-penalty'));
-        const selection = formData.get('selection') === 'on';
-        const startWeek = parseInt(formData.get('start-week'));
-        const climateFunctionKey = formData.get('climate-function');
-        const generationFunctionKey = formData.get('generation-function');
-        // add drop down for available alleles that can be selected from the scenarios? maybe
         const newConfig = {
-            carryingCapacity,
-            baseSurvivalRate,
-            mismatchPenalty,
-            selection,
-            startWeek,
+            carryingCapacity: parseInt(formData.get('carrying-capacity')),
+            baseSurvivalRate: parseFloat(formData.get('base-survival-rate')),
+            mismatchPenalty: parseFloat(formData.get('mismatch-penalty')),
+            selection: formData.get('selection') === 'on',
+            startWeek: parseInt(formData.get('start-week')),
             availableAlleles: simulation.availableAlleles,
-            climateGenerator: climateFunctionKey,
-            generationGenerator: generationFunctionKey,
+            climateGenerator: formData.get('climate-function'),
+            generationGenerator: formData.get('generation-function'),
         };
         currentConfig = newConfig;
         replaceSimulation()
@@ -485,6 +619,8 @@ function main() {
         configForm.elements['mismatch-penalty'].disabled = !e.target.checked;
         toggleInputGroup(document.getElementById('input-group-mismatch-penalty'), configForm.elements['selection'].checked);
     });
+
+    // -- generate dropdown options --
 
     const climateSelect = configForm.elements['climate-function'];
     const generationSelect = configForm.elements['generation-function'];
@@ -503,7 +639,7 @@ function main() {
         generationSelect.appendChild(option);
     }
 
-    // --- form input events ---
+    // --- control form input events ---
 
     const controlForm = document.getElementById('control-form');
     const inputGroupEndCondition = document.getElementById('input-group-end-condition');
