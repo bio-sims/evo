@@ -15,6 +15,7 @@
     --cr-bg-contrast: rgb(212, 212, 212);
     --cr-accent: rgb(168, 54, 255);
     --cr-button: rgb(0, 0, 0);
+    --cr-button-disabled: rgb(0, 0, 0, 0.5);
     --br-radius-small: 0.25rem;
     --cr-warning: rgb(255, 0, 0);
 }
@@ -43,8 +44,8 @@ button:hover {
 }
 
 button:disabled {
-    background-color: var(--cr-bg-secondary);
-    color: var(--cr-text-grey);
+    opacity: 0.5;
+    background-color: var(--cr-button-disabled);
     cursor: not-allowed;
 }
 
@@ -106,6 +107,7 @@ nav > ul > li {
     width: 100%;
     height: 100%;
     text-decoration: none;
+    color: var(--cr-text-primary);
     font-size: 1.25rem;
     padding: 0 1rem;
     transition: all 0.15s ease-in-out;
@@ -579,4 +581,26 @@ article.genotype-grid {
     border: 1px solid rgba(0, 0, 0, 0.1);
     transition: all 0.20s ease-in-out;
     font-weight: bold;
+}
+
+div.card-progress {
+    position: absolute;
+    bottom: 0rem;
+    left: 0rem;
+    width: 100%;
+    height: 0.5rem;
+    background-color: transparent;
+    border-bottom-left-radius: var(--br-radius-small);
+    border-bottom-right-radius: var(--br-radius-small);
+    overflow: hidden;
+}
+
+div.card-progress > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background-color: var(--cr-accent);
+    transition: width 0.5s ease-out;
 }
