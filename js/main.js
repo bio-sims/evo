@@ -309,6 +309,20 @@ function updateWeatherBar() {
 }
 
 /**
+ * Updates the width of a given element to reflect the current progress
+ * @param {HTMLElement} progressBar - The element whose width to update
+ * @param {number} current - The current progress value
+ * @param {number} total - The goal progress value
+ */
+function updateProgressBar(progressBar, current, total) {
+    if (!simulation) {
+        progressBar.style.width = '0%';
+        return;
+    }
+    progressBar.style.width = `${Math.min((current / total) * 100, 100)}%`;
+}
+
+/**
  * Updates the status panel with the current simulation information
  */
 function updateStatusPanel() {
@@ -490,52 +504,70 @@ function main() {
         presetsContainer.appendChild(presetClone);
     }
 
+    const controlPlayProgressBar = document.querySelector('#play-progress-bar > div');
+
     // --- button event listeners ---
 
     // simulation control button events
-
+    
     /**
      * The number of times the simulation has run in the current interval
      * @type {number}
-     */
-    let runCount = 0;
+    */
+   let runCount = 0;
+
+    const onPlayEnd = () => {
+        clearInterval(currentInterval);
+        currentInterval = null;
+        document.getElementById('play-button').textContent = 'Play';
+        // re-enable the advance button
+        document.getElementById('advance-button').disabled = false;
+    }
+
+    const handleAdvance = (e) => {
+        advanceSimulation();
+    }
+
     const runSimulation = (e) => {
         if (doEndCondition && runCount >= endConditionValue) {
-            // end condition reached
-            clearInterval(currentInterval);
-            currentInterval = null;
-            e.target.textContent = 'Play';
             runCount = 0;
+            onPlayEnd();
         } else if (simulation.hares.length === 0) {
-            // no more hare generations remain
-            clearInterval(currentInterval);
-            currentInterval = null;
-            e.target.textContent = 'Play';
             populationWiped = true;
+            onPlayEnd();
         } else {
             advanceSimulation(false);
             runCount++;
         }
+        if (doEndCondition) {
+            updateProgressBar(controlPlayProgressBar, runCount, endConditionValue);
+        }
     };
 
-    const toggleSimulation = (e) => {
+    const togglePlaySimulation = (e) => {
+        runCount = 0;
+        updateProgressBar(controlPlayProgressBar, runCount, endConditionValue);
         if (currentInterval) {
-            clearInterval(currentInterval);
-            currentInterval = null;
-            e.target.textContent = 'Play';
+            onPlayEnd();
         } else {
             currentInterval = setInterval(() => runSimulation(e), playRate);
             e.target.textContent = 'Stop';
+            // disable the advance button while the simulation is running
+            document.getElementById('advance-button').disabled = true;
         }
     };
 
     const resetSimulation = () => {
         runCount = 0;
+        populationWiped = false;
+        updateProgressBar(controlPlayProgressBar, runCount, endConditionValue);
         replaceSimulation();
+        // re-enable the advance button
+        document.getElementById('advance-button').disabled = false;
     };
 
-    document.getElementById('advance-button').addEventListener('click', advanceSimulation);
-    document.getElementById('play-button').addEventListener('click', toggleSimulation);
+    document.getElementById('advance-button').addEventListener('click', handleAdvance);
+    document.getElementById('play-button').addEventListener('click', togglePlaySimulation);
     document.getElementById('reset-button').addEventListener('click', resetSimulation);
 
     // graph button events
@@ -659,6 +691,9 @@ function main() {
     controlForm.querySelector('#do-end-condition').addEventListener('change', (e) => {
         doEndCondition = e.target.checked;
         toggleInputGroup(inputGroupEndCondition, doEndCondition);
+        // ensure the progress bar is reset while the simulation is running
+        updateProgressBar(controlPlayProgressBar, 0, endConditionValue);
+        runCount = 0;
     });
 
     controlForm.querySelector('#end-condition-value').addEventListener('input', (e) => {
