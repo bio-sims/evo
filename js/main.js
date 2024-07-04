@@ -7,6 +7,8 @@
 
 import { Chart, LineController, LineElement, Filler, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip } from 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/+esm';
 Chart.register(LineController, LineElement, Filler, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip);
+// js does not have a built-in way to seed Math.random, so we use a library
+import seedrandom from 'https://cdn.jsdelivr.net/npm/seedrandom@3.0.5/+esm';
 import { Simulation } from "./modules/simulation.js";
 import configFile from "../sim.config.js";
 import { makeAlleleGraphConfig, makeSnowGraphConfig } from './modules/graphs.js';
@@ -77,7 +79,7 @@ let populationWiped = false;
  * Whether to use an end condition for the interval
  * @type {boolean}
  */
-let doEndCondition = false;
+let doEndCondition = true;
 /**
  * The number of advances to make before stopping the interval
  * @type {number}
@@ -345,6 +347,13 @@ function replaceSimulation() {
     }
     // reset text regardless
     document.getElementById('play-button').textContent = 'Play';
+    // set the seed if it exists
+    if (currentConfig.seed) {
+        console.log('setting seed', currentConfig.seed);
+        seedrandom(currentConfig.seed, { global: true });
+    } else {
+        seedrandom({ global: true });
+    }
     // regenerate the climate and generation functions
     for (const [key, value] of Object.entries(climateFunctions)) {
         climateFunctions[key] = new value.constructor(currentConfig.startWeek, 0);
@@ -352,6 +361,7 @@ function replaceSimulation() {
     for (const [key, value] of Object.entries(generationFunctions)) {
         generationFunctions[key] = new value.constructor(currentConfig.startWeek);
     }
+    // seed the random number generator if a seed is provided
     simulation = new Simulation({ ...currentConfig, climateGenerator: climateFunctions[currentConfig.climateGenerator], generationGenerator: generationFunctions[currentConfig.generationGenerator] });
     window.simulation = simulation; // temp
     // initialize grid
@@ -365,13 +375,6 @@ function replaceSimulation() {
  * Resets and reinitializes the simulation with the currently selected scenario
  */
 function updateScenario() {
-    // recreate the dependencies since they may have random elements or be startweek dependent
-    for (const [key, value] of Object.entries(climateFunctions)) {
-        climateFunctions[key] = new value.constructor(currentConfig.startWeek, 0);
-    }
-    for (const [key, value] of Object.entries(generationFunctions)) {
-        generationFunctions[key] = new value.constructor(currentConfig.startWeek);
-    }
     currentConfig = { ...scenarios[selectedScenarioIndex].options };
     // set all form values to the current scenario
     const form = document.getElementById('config-form');
@@ -388,6 +391,16 @@ function updateScenario() {
 
     // similarly, determine if the mismatch penalty input should be disabled
     form.elements['mismatch-penalty'].disabled = !currentConfig.selection;
+
+    // rng seed form values
+    if (currentConfig.seed) {
+        form.elements['do-unset-seed'].checked = false;
+        form.elements['rng-seed'].value = currentConfig.seed;
+    } else {
+        form.elements['do-unset-seed'].checked = true;
+        form.elements['rng-seed'].value = '';
+    }
+    toggleInputGroup(document.getElementById('input-group-rng-seed'), !form.elements['do-unset-seed'].checked);
 
     // set the climate and generation functions, matching by name
     const climateSelect = form.elements['climate-function'];
@@ -496,6 +509,8 @@ function main() {
             // add --selected to the clicked preset
             presetClone.classList.add('preset-entry--selected');
             selectedScenarioIndex = i;
+            // hide apply message in case it was shown before
+            document.getElementById('config-form-apply-msg').classList.add('hidden');
             updateScenario();
         });
         if (i === selectedScenarioIndex) {
@@ -509,7 +524,7 @@ function main() {
     // --- button event listeners ---
 
     // simulation control button events
-    
+
     /**
      * The number of times the simulation has run in the current interval
      * @type {number}
@@ -530,7 +545,6 @@ function main() {
 
     const runSimulation = (e) => {
         if (doEndCondition && runCount >= endConditionValue) {
-            runCount = 0;
             onPlayEnd();
         } else if (simulation.hares.length === 0) {
             populationWiped = true;
@@ -633,6 +647,10 @@ function main() {
             climateGenerator: formData.get('climate-function'),
             generationGenerator: formData.get('generation-function'),
         };
+        if (formData.get('do-unset-seed') !== 'on') {
+            newConfig.seed = formData.get('rng-seed');
+        }
+        toggleInputGroup(document.getElementById('input-group-rng-seed'), !formData.get('do-unset-seed'));
         currentConfig = newConfig;
         replaceSimulation()
 
@@ -646,6 +664,11 @@ function main() {
     configForm.elements['selection'].addEventListener('change', (e) => {
         configForm.elements['mismatch-penalty'].disabled = !e.target.checked;
         toggleInputGroup(document.getElementById('input-group-mismatch-penalty'), configForm.elements['selection'].checked);
+    });
+
+    configForm.elements['do-unset-seed'].addEventListener('change', (e) => {
+        configForm.elements['rng-seed'].disabled = !e.target.checked;
+        toggleInputGroup(document.getElementById('input-group-rng-seed'), !e.target.checked);
     });
 
     // -- generate dropdown options --

@@ -128,6 +128,21 @@ export default
         "climateGenerator": "IntegralVariableClimate",
         "generationGenerator": "GenerationEvery18Weeks"
       }
+    },
+    {
+      "name": "Consistent Scenario",
+      "description": "Seed where earliest week allele recovers due to climate change. Selection, large population, and a variable climate.",
+      "options": {
+        "selection": true,
+        "startWeek": 0,
+        "availableAlleles": "basicAlleles",
+        "carryingCapacity": 500,
+        "baseSurvivalRate": 0.96,
+        "mismatchPenalty": 0.07,
+        "climateGenerator": "IntegralVariableClimate",
+        "generationGenerator": "GenerationEvery18Weeks",
+        "seed": "some string"
+      }
     }
   ]
 }

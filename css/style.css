@@ -391,7 +391,7 @@ form > .input-group output {
     width: 100%;
 }
 
-select, input[type="number"] {
+select, input[type="number"], input[type="text"] {
     width: 100%;
     padding: 0.5rem;
     border: 1px solid rgba(0, 0, 0, 0.1);
