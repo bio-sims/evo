@@ -539,7 +539,16 @@ function main() {
         document.getElementById('advance-button').disabled = false;
     }
 
+    const validControlForm = () => {
+        if (!document.getElementById('control-form').checkValidity()) {
+            document.getElementById('control-form').reportValidity();
+            return false;
+        }
+        return true;
+    }
+
     const handleAdvance = (e) => {
+        if (!validControlForm()) return;
         advanceSimulation();
     }
 
@@ -564,6 +573,7 @@ function main() {
         if (currentInterval) {
             onPlayEnd();
         } else {
+            if (!validControlForm()) return;
             currentInterval = setInterval(() => runSimulation(e), playRate);
             e.target.textContent = 'Stop';
             // disable the advance button while the simulation is running
