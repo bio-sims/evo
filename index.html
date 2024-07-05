@@ -63,7 +63,7 @@
                             <label for="advance-rate-value">Advance every </label>
                         </div>
                         <div class="input-group-half right-align">
-                            <input type="number" id="advance-rate-value" name="advance-rate-value" value="1">
+                            <input type="number" id="advance-rate-value" name="advance-rate-value" value="1" min="1" max="1000" required>
                             <select id="advance-rate-type" name="advance-rate-type">
                                 <option value="weeks">weeks</option>
                                 <option value="generations">generations</option>
@@ -77,7 +77,7 @@
                         </div>
                         <div class="input-group-half right-align">
                             <div class="annotated-input">
-                                <input type="number" id="end-condition-value" name="end-condition-value" value="10">
+                                <input type="number" id="end-condition-value" name="end-condition-value" value="10" min="1" required>
                                 <span>advances</span>
                             </div>
                             <input type="checkbox" id="do-end-condition" name="do-end-condition">
@@ -118,7 +118,7 @@
                             <label for="carrying-capacity">Carrying Capacity</label>
                         </div>
                         <div class="input-group-half right-align">
-                            <input type="number" id="carrying-capacity" name="carrying-capacity" value="100">
+                            <input type="number" id="carrying-capacity" name="carrying-capacity" value="100" min="1" max="10000" required>
                         </div>
                     </div>
                     <div class="input-group range">
@@ -176,7 +176,7 @@
                             <label for="rng-seed">Generator Seed</label>
                         </div>
                         <div class="input-group-half right-align">
-                            <input type="text" id="rng-seed" name="rng-seed" value="">
+                            <input type="text" id="rng-seed" name="rng-seed" value="" required>
                         </div>
                     </div>
                     <div class="input-group">
