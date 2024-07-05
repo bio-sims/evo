@@ -29,6 +29,11 @@ div.wiki-page h4 {
     margin-bottom: 0.25rem;
 }
 
+div.wiki-page h5 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
 div.wiki-page h1, h2 {
     border-bottom: 1px solid var(--cr-border-primary);
     margin-bottom: 1rem;
