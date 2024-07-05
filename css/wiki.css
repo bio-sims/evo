@@ -54,17 +54,29 @@ div.wiki-page table {
     margin-top: 0;
     margin-bottom: 2rem;
 }
-
-div.wiki-page table tr td.nowrap {
-    text-wrap: nowrap;
+@media (width > 600px) {
+    div.wiki-page table tr td.nowrap {
+        text-wrap: nowrap;
+    }
 }
 
 div.wiki-page table th {
     font-weight: 600;
 }
 
+@media (width >= 600px) {
+    div.wiki-page table th, div.wiki-page table td {
+        padding: 6px 13px;
+    }
+}
+
+@media (width < 600px) {
+    div.wiki-page table th, div.wiki-page table td {
+        padding: 2px 2px;
+    }
+}
+
 div.wiki-page table th, div.wiki-page table td {
-    padding: 6px 13px;
     border: 1px solid var(--cr-border-primary);
 }
 
@@ -105,16 +117,38 @@ main.wiki-container {
     width: 100%;
     height: 100%;
     gap: 1rem;
-    padding: 1rem;
     align-items: flex-start;
     max-width: 1400px;
 }
 
+@media (width >= 600px) {
+    main.wiki-container {
+        padding: 1rem;
+    }
+}
+
+@media (width < 600px) {
+    main.wiki-container {
+        padding: 0.25rem;
+    }
+}
+
 .wiki-card {
     flex: 1;
-    padding: 2rem;
     background-color: var(--cr-bg-secondary);
     border-radius: var(--br-radius-small);
+}
+
+@media (width >= 600px) {
+    .wiki-card {
+        padding: 2rem;
+    }
+}
+
+@media (width < 600px) {
+    .wiki-card {
+        padding: 0.5rem;
+    }
 }
 
 section.wiki-sidebar {
@@ -148,32 +182,6 @@ article.wiki-content-container {
     flex-grow: 4;
 }
 
-button.hamburger {
-    margin: 0;
-    min-width: 0;
-    padding: 0;
-    width: 2.5rem;
-    border: none;
-    background: none;
-    cursor: pointer;
-}
-
-#nav-hamburger {
-    margin-left: auto;
-}
-
-button.hamburger span {
-    display: block;
-    height: 2px;
-    background-color: var(--cr-text-primary);
-    margin: 0.25rem;
-}
-
-@media (width >= 1000px) {
-    button.hamburger {
-        display: none;
-    }
-}
 @media (width < 1000px) {
     nav.wiki-nav {
         position: sticky;

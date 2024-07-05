@@ -55,6 +55,10 @@ export default class Grid {
 
         // update tooltip content only on mouseover (performance optimization)
         element.addEventListener("mouseover", (e) => {
+            // reset inline styles initially
+            tooltip.style.left = "";
+            tooltip.style.right = "";
+            // get the hare and the tooltip content
             const hare = this.hares[id];
             const tooltipContent = tooltip.querySelector(".tooltip-content");
             const tooltipImage = tooltip.querySelector(".grid-hare");
@@ -70,11 +74,18 @@ export default class Grid {
                 <span><b>Whiteness:</b> ${Math.round(hare.whiteness * 100)}%</span>
                 <span><b>Alive:</b> ${hare.alive ? "Yes" : "No"}</span>
             `;
-            // for now, we can't tell if the hare died mismatched due to update suppression (or time "skips" as far as the grid is considered)
             if (hare.alive) {
                 tooltipContent.innerHTML += `<span><b>Mismatched:</b> ${hare.isMismatched(this.simulation.snowCoverage) ? "Yes" : "No"}</span>`;
             } else {
                 tooltipContent.innerHTML += `<span><b>Died mismatched:</b> ${hare.wasMismatched ? "Yes" : "No"}</span>`;
+            }
+            // move the tooltip to the right if itʻs overflowing the left side of the screen
+            const toolTipBounds = tooltip.getBoundingClientRect();
+            const gridItemBounds = element.getBoundingClientRect();
+            console.log(gridItemBounds, toolTipBounds);
+            if (toolTipBounds.left < 0) {
+                tooltip.style.left = `${0 - gridItemBounds.left}px`;
+                tooltip.style.right = "auto";
             }
         });
         return element;
