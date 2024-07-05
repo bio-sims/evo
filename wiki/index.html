@@ -5,9 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" type="text/css" href="../css/style.css">
+    <link rel="stylesheet" type="text/css" href="../css/wiki.css">
 </head>
 <body>
-    <nav>
+    <nav class="wiki-nav">
         <ul>
             <li>
                 <h1>Evo</h1>
@@ -18,7 +19,293 @@
             <li>
                 <a class="nav-link" href="./">Wiki</a>
             </li>
+            <li id="nav-hamburger">
+                <button class="hamburger" id="hamburger">
+                    <span></span><span></span><span></span>
+                </button>
+            </li>
         </ul>
     </nav>
+    <div class="wiki-page">
+        <main class="wiki-container">
+            <!-- contents card for larger displays -->
+            <section class="wiki-sidebar wiki-card" id="large-contents">
+                <h2>Contents</h2>
+                <ul>
+                    <li><a href="#about">About Evo</a></li>
+                    <li><a href="#controls">Controls</a></li>
+                    <li><a href="#config">Configuration</a></li>
+                    <li><a href="#visualizaitons">Visualizations</a></li>
+                    <li><a href="#advanced-config">Advanced Configuration</a></li>
+                    <li><a href="#references">References</a></li>
+                </ul>
+            </section>
+            <article class="wiki-content-container wiki-card">
+                <section id="about">
+                    <h1>About Evo</h1>
+                    <p>Welcome to the population genetics simulation known as Evo. This simulation is designed to help you further understand population genetics and how underlying forces such as natural selection and climate stability play a role in varying populations. This simulation was inspired by field work done on snowshoe hares in Montana. These animals were found to have genes that cause them to seasonally change from white to brown to match the color of the ground as snow melts. Field researchers found that for each week a hare&apos;s coat mismatched it&apos;s environment, it was 7% less likely to survive natural selection due to predation (e.g. owls and foxes). These are the default values used in the simulation but can be modified for the sake of experimentation.</p>
+                    <p>To help us understand population genetics, this simulation by default starts with a hypothetical population containing 4 equally abundant alleles (A.wk.15, A.wk.24, A.wk.26, A.wk.35). The number in each allele indicates the week of the year a homozygote will switch its coat from white to brown.</p>
+                    <p>There are six separate simulations each one focusing on variances in size of population, stability of the climate or the presence of natural selection. Each simulation tracks the hypothetical population of hares and their four alleles as they evolve over time. Any changes to the variables mentioned above, can have an impact on the evolution of the population of hares. When running the simulation you&apos;ll find a graph presenting the change of allele frequencies over time and a graph presenting the change in the week of snow melt for each year in the simulation. There is also a grid which has a box element for each hare with their current state in the given week of the simulation. Use both of these graphs to analyze trends and look at any underlying forces producing the allele frequencies you see. Just like in the biosphere, chance events like random mating and the success of individual animals will play a role in how these simulated populations evolve. Feel free to run each simulation as many times as you want to better understand these things.</p>
+                </section>
+                <section id="controls">
+                    <h2>Controls</h2>
+                    <p>The simulation can be ran one advancement at a time or played back in real time. There are a few controls that you can use to interact with the simulation. Below is a list of the controls and their functions.</p>
+                    <h3>Simulation Controls</h3>
+                    <p>These controls are used to interact with the simulation itself.</p>
+                    <h4>Advance every</h4>
+                    <p>This controls the amount of time that will be simulated with each advancement, either through the advance button or the play button. The default value is 1 week and can be changed to use years or generations.</p>
+                    <h4>Stop playing after</h4>
+                    <p>Toggling this option on will stop the playback after a set amount of advances. For example, having an advancement rate of 1 year and a playback limit of 50 advances will run the simulation one year at a time until 50 years have passed from the given point in time. Disabling this option will cause the simulation to play infinitely until it is explicitly stopped by the user.</p>
+                    <h4>Playback speed</h4>
+                    <p>This controls the speed at which the simulation will play back in milliseconds. This ranges from <code>100ms</code> to <code>2500ms</code>.
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Button</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="nowrap">Advance</td>
+                                <td>Advances the simulation by the amount of time set in the "Advance every" control.</td>
+                            </tr>
+                            <tr>
+                                <td class="nowrap">Play/Stop</td>
+                                <td>Toggles playback of the simulation. Stopping early and starting again will consider the current point in time as the starting point.</td>
+                            </tr>
+                            <tr>
+                                <td class="nowrap">Reset</td>
+                                <td>Resets the simulation to the beginning of the current configuration.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section id="visualizaitons">
+                    <h2>Visualizations</h2>
+                    <p>There are three main visualizations that are used to help you understand the simulation. Below is a description of each of the visualizations and how they can be used to analyze the data.</p>
+                    <h3>Allele Frequency Graph</h3>
+                    <p>Displays the relative frequency data of the alleles in the population per week with the y-axis representing the frequency from 0.0 to 1.0, and the x-axis representing the week (labeled as the year and week of the year). The graph can be toggled to show an area chart which will cause the allele frequencies to stack on top of each other to show the total frequency of all alleles in the population.</p>
+                    <div class="flex-center">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Button</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="nowrap">Toggle Area Chart</td>
+                                    <td>Toggles the graph between a line chart and an area chart.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Toggle Generation Ticks</td>
+                                    <td>Toggles the display of generation ticks on the x-axis rather than years/weeks</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h3>Genotype Grid</h3>
+                    <p>Displays a box for each hare present in the simulation. The left side of the box has two sections, both which display the genotypic coloring of the alleles possessed by the hare. The right side is a representation of the current whitness of the hare. Each box can be hovered for additional information of the hare, including the allele names, the exact whiteness percentage, its status of being alive, and if it is currently mistmatched</p>
+                    <p>As the simulation progresses, the boxes will be stylized differently to represent various states of the hares. A hare outlined in red is currently mismatched, while a greyed out hare is dead and will be replaced in the next generation. Dead hares will not update and will maintain their whiteness and note in the tooltip if they died while being mismatched. For convenience, a snow coverage bar is placed at the bottom of the grid with the current percentage of snow.</p>
+                    <h3>Snow Coverage Graph</h3>
+                    <p>By default, the snow coverage graph displays the first week the simulation experiences snowless coverage in a year, with the y-axis representing the week of the year and the x-axis representing the year. The graph can be toggled to show the snow coverage for each week of the years which is available due to the simulations ability to work with more complicated climates than the defaults.</p>
+                    <div class="flex-center">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Button</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="nowrap">Toggle Snow Data</td>
+                                    <td>Toggle between showing per-week snow coverage and first snowless week data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                </section>
+                <section id="config">
+                    <h2 id="config">Configuration</h2>
+                    <p>Even though here are default preset values for the simulation, you can also modify them yourself. Below is a explanation of each of the variables you can modify from the configuration panel.</p>
+                    <div class="flex-center">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Variable</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="nowrap">Carrying Capacity</td>
+                                    <td>The maximum number of hares that can be supported by the environment. When a new generation occurs in a week, the population will repopulate to this number.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Base Survival Rate</td>
+                                    <td>The base survival rate of hares in the environment. This is the rate at which hares survive predation and other factors that would cause them to die.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Simulate Allele Selection</td>
+                                    <td>Whether or not the coat colors of the hares will cause them to be more or less likely to survive. If this is set to true, a penalty will be invoked for hares with coats that exert a contrast greater than 60% compared against the mean snow coverage.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Mismatch Penalty</td>
+                                    <td>The aforementioned penalty applied to hares that do not match their environment. This penalty is applied to the base survival rate of hares, a 0 or negative value guarantees the hare will not survive.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Climate Function</td>
+                                    <td>The function used to determine the snow coverage for each week of the year. See the climate function section for more details.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Generation Function</td>
+                                    <td>The function used to determine when the population will repopulate. See the generation function section for more details.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Use a Random Seed</td>
+                                    <td>Whether or not the simulation will be completely random. If it is set to false, a seed can be provided to generate the same results each time the simulation is run in the same environment.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Random Seed</td>
+                                    <td>The seed used to generate the random numbers for the simulation. This can be a string, meaning any amount of characters or spaces is a valid seed.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">Start Week</td>
+                                    <td>The week of the year the simulation will start on. This can be any number between <code>0</code> and <code>51</code>.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section id="advanced-config">
+                    <h2>Advanced Configuration</h2>
+                    <p>If you have chosen to run this simulation locally, you may have noticed the <code>sim.config.js</code> file. This has been explained in the README, but here are its specifications.</p>
+                    <h4>alleleSets</h4>
+                    <p>This is an array containing sets of allele objects. The name of the set can be referenced in presets/scenarios. Each allele should have the following properties, though a question mark indicates that the property is optional:</p>
+                    <div class="flex-center">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="nowrap">id</td>
+                                    <td class="nowrap">Integer</td>
+                                    <td>Unique identifier for the allele.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">name</td>
+                                    <td class="nowrap">String</td>
+                                    <td>Friendly display name of the allele.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">type</td>
+                                    <td class="nowrap">String</td>
+                                    <td>The type of the allele. Currently, coat alleles are used.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">brownWeek</td>
+                                    <td class="nowrap">Integer</td>
+                                    <td>Week of the year a homozygote will switch its coat from white to brown.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">brownRate</td>
+                                    <td class="nowrap">Float</td>
+                                    <td>Decimal rate at which a homozygote will switch its coat from white to brown, with 1 being instant.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">whiteWeek</td>
+                                    <td class="nowrap">Integer</td>
+                                    <td>Week of the year a homozygote will switch its coat from brown to white.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">whiteRate</td>
+                                    <td class="nowrap">Float</td>
+                                    <td>Decimal rate at which a homozygote will switch its coat from brown to white, with 1 being instant.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">geneColor?</td>
+                                    <td class="nowrap">Hex RGB String</td>
+                                    <td>Color of the allele when displayed across the simulation.</td>
+                                </tr>
+                        </table>
+                    </div>
+                    <h4>scenarios</h4>
+                    <p>This is an array containing sets of scenario objects. These will be displayed in the preset panel of the simulation. The scenario should have a <code>name</code>, <code>description</code>, and <code>options</code> object. The <code>options</code> object should contain the following properties, though a question mark indicates that the property is optional:</p>
+                    <div class="flex-center">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Property</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="nowrap">selection</td>
+                                    <td class="nowrap">Boolean</td>
+                                    <td>Whether or not selection should be enabled</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">startWeek</td>
+                                    <td class="nowrap">Integer</td>
+                                    <td>Week of the year the simulation will start on.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">availableAlleles</td>
+                                    <td class="nowrap">String</td>
+                                    <td>Name of the allele set to use for the simulation.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">carryingCapacity</td>
+                                    <td class="nowrap">Integer</td>
+                                    <td>Maximum number of hares that can be supported by the environment.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">baseSurvivalRate</td>
+                                    <td class="nowrap">Float</td>
+                                    <td>Base survival rate of hares in the environment.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">mismatchPenalty</td>
+                                    <td class="nowrap">Float</td>
+                                    <td>Penalty applied to hares that do not match their environment.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">climateGenerator</td>
+                                    <td class="nowrap">String</td>
+                                    <td>Name of the climate function to use for the simulation.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">generationGenerator</td>
+                                    <td class="nowrap">String</td>
+                                    <td>Name of the generation function to use for the simulation.</td>
+                                </tr>
+                                <tr>
+                                    <td class="nowrap">seed?</td>
+                                    <td class="nowrap">String</td>
+                                    <td>Seed used to generate the random numbers for the simulation. If not provided, a random seed will be used.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section id="references">
+                    <h2>References and Acknowledgements</h2>
+                    <h3>Authors</h3>
+                    <p>This simulation's implementation was primarily developed and led by Zachary Mullen with additional input from Rena Ahn, Gina Philipose and mentorship under Dr. Nate Kremer-Herman of the Computer Science Department and Dr. Robert Rutherford. Dr. Rutherford primarily constructed the base requirements and concept of the simulation. Additionally, the simulation is an extended implementation of a previous implementation authored by Dr. Rutherford, Jeremy Bjeljac, Sam Levy, Richard Charczenko, Madeline McMahon of the Seattle University Biology Department.
+                    <h3>Citations</h3>
+                    <p>Zimova, M., Mills, L.S. and Nowak, J.J. (2016), High fitness costs of climate change-induced camouflage mismatch. Ecol Lett, 19: 299-307. <a href="https://doi.org/10.1111/ele.12568">https://doi.org/10.1111/ele.12568</a></p>
+                </section>
+            </article>
+        </main>
+    </div>
 </body>
 </html>

@@ -1,0 +1,182 @@
+/* some styles taken from GitHub markdown stylings */
+:root {
+    --cr-border-primary: rgb(208 215 222 / 70%);
+    --cr-border-secondary: rgba(175, 184, 193, 0.20);
+}
+div.wiki-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+div.wiki-page h1 {
+    font-size: 2rem;
+}
+
+div.wiki-page h2 {
+    font-size: 1.75rem;
+}
+
+div.wiki-page h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+div.wiki-page h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+div.wiki-page h1, h2 {
+    border-bottom: 1px solid var(--cr-border-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+}
+
+div.wiki-page p {
+    margin-bottom: 1rem;
+}
+
+div.wiki-page table {
+    display: table;
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    max-width: 100%;
+    overflow: auto;
+    margin-top: 0;
+    margin-bottom: 2rem;
+}
+
+div.wiki-page table tr td.nowrap {
+    text-wrap: nowrap;
+}
+
+div.wiki-page table th {
+    font-weight: 600;
+}
+
+div.wiki-page table th, div.wiki-page table td {
+    padding: 6px 13px;
+    border: 1px solid var(--cr-border-primary);
+}
+
+div.wiki-page table tr {
+    background-color: var(--cr-bg-secondary);
+    border-top: 1px solid var(--cr-border-primary);
+}
+
+div.wiki-page table tr td:first-child {
+    width: max-content;
+}
+
+div.wiki-page table tr:nth-child(2n) {
+    background-color: var(--cr-bg-primary);
+}
+
+div.wiki-page code {
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    padding: .2rem .4rem;
+    font-size: inherit;
+    margin: 0;
+    font-size: 85%;
+    white-space: break-spaces;
+    background-color: var(--cr-border-secondary);
+    border-radius: var(--br-radius-small);
+}
+
+div.wiki-page .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+main.wiki-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    gap: 1rem;
+    padding: 1rem;
+    align-items: flex-start;
+    max-width: 1400px;
+}
+
+.wiki-card {
+    flex: 1;
+    padding: 2rem;
+    background-color: var(--cr-bg-secondary);
+    border-radius: var(--br-radius-small);
+}
+
+section.wiki-sidebar {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    position: sticky;
+    top: 1rem;
+    align-self: flex-start;
+    overflow-y: visible;
+}
+
+section.wiki-sidebar ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style-type: none;
+    padding: 0;
+}
+
+section.wiki-sidebar a {
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: var(--cr-text-primary);
+}
+
+article.wiki-content-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 4;
+}
+
+button.hamburger {
+    margin: 0;
+    min-width: 0;
+    padding: 0;
+    width: 2.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+#nav-hamburger {
+    margin-left: auto;
+}
+
+button.hamburger span {
+    display: block;
+    height: 2px;
+    background-color: var(--cr-text-primary);
+    margin: 0.25rem;
+}
+
+@media (width >= 1000px) {
+    button.hamburger {
+        display: none;
+    }
+}
+@media (width < 1000px) {
+    nav.wiki-nav {
+        position: sticky;
+        top: 0;
+        overflow-y: visible;
+        overflow-x: hidden;
+    }
+    #large-contents {
+        display: none;
+    }
+}
