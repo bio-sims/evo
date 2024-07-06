@@ -45,6 +45,7 @@ let currentConfig = { ...scenarios[selectedScenarioIndex].options };
 // replace any string names in scenario's available alleles with the actual objects
 for (const scenario of scenarios) {
     if (typeof scenario.options.availableAlleles === 'string') {
+        scenario.options.alleleSetName = scenario.options.availableAlleles;
         scenario.options.availableAlleles = alleleSets[scenario.options.availableAlleles];
     }
 }
@@ -349,7 +350,6 @@ function replaceSimulation() {
     document.getElementById('play-button').textContent = 'Play';
     // set the seed if it exists
     if (currentConfig.seed) {
-        console.log('setting seed', currentConfig.seed);
         seedrandom(currentConfig.seed, { global: true });
     } else {
         seedrandom({ global: true });
@@ -402,12 +402,16 @@ function updateScenario() {
     }
     toggleInputGroup(document.getElementById('input-group-rng-seed'), !form.elements['do-unset-seed'].checked);
 
+    // set the available alleles dropdown to the current scenario's available alleles
+    const alleleSelect = form.elements['allele-set'];
+    console.log(alleleSelect.options);
+    alleleSelect.value = scenarios[selectedScenarioIndex].options.alleleSetName;
     // set the climate and generation functions, matching by name
     const climateSelect = form.elements['climate-function'];
     const generationSelect = form.elements['generation-function'];
     // find the index based on the original scenario's name
-    climateSelect.selectedIndex = Array.from(climateSelect.options).findIndex((option) => option.value === scenarios[selectedScenarioIndex].options.climateGenerator);
-    generationSelect.selectedIndex = Array.from(generationSelect.options).findIndex((option) => option.value === scenarios[selectedScenarioIndex].options.generationGenerator);
+    climateSelect.value = scenarios[selectedScenarioIndex].options.climateGenerator;
+    generationSelect.value = scenarios[selectedScenarioIndex].options.generationGenerator;
     replaceSimulation();
 }
 
@@ -485,6 +489,36 @@ function advanceSimulation(animate = true) {
  */
 function main() {
     weatherBar = document.getElementById('weather-bar');
+    const controlForm = document.getElementById('control-form');
+    const configForm = document.getElementById('config-form');
+
+    // -- generate dropdown options --
+
+    const alleleSelect = configForm.elements['allele-set'];
+    const climateSelect = configForm.elements['climate-function'];
+    const generationSelect = configForm.elements['generation-function'];
+
+    for (const [key, value] of Object.entries(alleleSets)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = key;
+        alleleSelect.appendChild(option);
+    }
+
+    for (const [key, value] of Object.entries(climateFunctions)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = value.friendlyName;
+        climateSelect.appendChild(option);
+    }
+
+    for (const [key, value] of Object.entries(generationFunctions)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = value.friendlyName;
+        generationSelect.appendChild(option);
+    }
+
     updateScenario();
 
     // define basic preset element
@@ -632,9 +666,6 @@ function main() {
 
     // --- config form events ---
 
-    // tie form submission to simulation update
-    const configForm = document.getElementById('config-form');
-
     // if any field changes, display a message informing the user to apply the changes
     configForm.addEventListener('input', () => {
         document.getElementById('config-form-apply-msg').classList.remove('hidden');
@@ -653,7 +684,7 @@ function main() {
             mismatchPenalty: parseFloat(formData.get('mismatch-penalty')),
             selection: formData.get('selection') === 'on',
             startWeek: parseInt(formData.get('start-week')),
-            availableAlleles: simulation.availableAlleles,
+            availableAlleles: alleleSets[formData.get('allele-set')],
             climateGenerator: formData.get('climate-function'),
             generationGenerator: formData.get('generation-function'),
         };
@@ -681,28 +712,8 @@ function main() {
         toggleInputGroup(document.getElementById('input-group-rng-seed'), !e.target.checked);
     });
 
-    // -- generate dropdown options --
-
-    const climateSelect = configForm.elements['climate-function'];
-    const generationSelect = configForm.elements['generation-function'];
-
-    for (const [key, value] of Object.entries(climateFunctions)) {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = value.friendlyName;
-        climateSelect.appendChild(option);
-    }
-
-    for (const [key, value] of Object.entries(generationFunctions)) {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = value.friendlyName;
-        generationSelect.appendChild(option);
-    }
-
     // --- control form input events ---
 
-    const controlForm = document.getElementById('control-form');
     const inputGroupEndCondition = document.getElementById('input-group-end-condition');
     // set the initial values for the form inputs
     controlForm.querySelector('#advance-rate-value').value = advanceRateValue;
