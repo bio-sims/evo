@@ -1,7 +1,7 @@
 export default
 {
   "alleleSets": {
-    "basicAlleles": [
+    "Basic Alleles": [
       {
         "id": 1,
         "name": "Allele Br15.Wh36",
@@ -42,6 +42,28 @@ export default
         "whiteRate": 1,
         "geneColor": "#8000ff"
       }
+    ],
+    "Test Alleles": [
+      {
+        "id": 1,
+        "name": "Allele Br5.Wh36",
+        "type": "coat",
+        "brownWeek": 5,
+        "brownRate": 1,
+        "whiteWeek": 36,
+        "whiteRate": 1,
+        "geneColor": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Allele Br1.Wh36",
+        "type": "coat",
+        "brownWeek": 1,
+        "brownRate": 1,
+        "whiteWeek": 36,
+        "whiteRate": 1,
+        "geneColor": "#80ff00"
+      }
     ]
   },
   "scenarios": [
@@ -51,7 +73,7 @@ export default
       "options": {
         "selection": false,
         "startWeek": 0,
-        "availableAlleles": "basicAlleles",
+        "availableAlleles": "Basic Alleles",
         "carryingCapacity": 500,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
@@ -65,7 +87,7 @@ export default
       "options": {
         "selection": false,
         "startWeek": 0,
-        "availableAlleles": "basicAlleles",
+        "availableAlleles": "Basic Alleles",
         "carryingCapacity": 20,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
@@ -79,7 +101,7 @@ export default
       "options": {
         "selection": true,
         "startWeek": 0,
-        "availableAlleles": "basicAlleles",
+        "availableAlleles": "Basic Alleles",
         "carryingCapacity": 500,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
@@ -93,7 +115,7 @@ export default
       "options": {
         "selection": true,
         "startWeek": 0,
-        "availableAlleles": "basicAlleles",
+        "availableAlleles": "Basic Alleles",
         "carryingCapacity": 20,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
@@ -107,7 +129,7 @@ export default
       "options": {
         "selection": true,
         "startWeek": 0,
-        "availableAlleles": "basicAlleles",
+        "availableAlleles": "Basic Alleles",
         "carryingCapacity": 500,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
@@ -121,7 +143,7 @@ export default
       "options": {
         "selection": true,
         "startWeek": 0,
-        "availableAlleles": "basicAlleles",
+        "availableAlleles": "Basic Alleles",
         "carryingCapacity": 20,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
@@ -135,7 +157,7 @@ export default
       "options": {
         "selection": true,
         "startWeek": 0,
-        "availableAlleles": "basicAlleles",
+        "availableAlleles": "Basic Alleles",
         "carryingCapacity": 500,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
