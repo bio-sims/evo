@@ -4,8 +4,9 @@
  * @module graphs
  */
 
-const displayWeek = (week, length) => {
-    if (length <= 52) {
+const displayWeek = (week, weekLabels) => {
+    console.log(week);
+    if (weekLabels[weekLabels.length - 1] < 52) {
         return week;
     }
     const year = Math.floor(week / 52);
@@ -41,9 +42,9 @@ const makeAlleleGraphConfig = (weekLabels, alleleGraphDatasets, useGenerations, 
                     ticks: {
                         callback: (val, index) => {
                             if (useGenerations) {
-                                return generationWeeks.includes(val) ? `Gen ${generationWeeks.indexOf(val) + 2}` : null;
+                                return generationWeeks.includes(weekLabels[index]) ? `Gen ${generationWeeks.indexOf(weekLabels[index]) + 2}` : null;
                             }
-                            return displayWeek(val, weekLabels.length);
+                            return displayWeek(weekLabels[index], weekLabels);
                         },
                         maxTicksLimit: 10,
                     }
@@ -125,9 +126,9 @@ const makeSnowGraphConfig = (labels, rawSnowData, isYearly) => {
                     ticks: {
                         callback: (val, index) => {
                             if (isYearly) {
-                                return val;
+                                return labels[index];
                             }
-                            return displayWeek(val, labels.length);
+                            return displayWeek(labels[index], labels);
                         },
                         maxTicksLimit: 10,
                     }

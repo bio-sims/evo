@@ -43,26 +43,46 @@ export default
         "geneColor": "#8000ff"
       }
     ],
-    "Test Alleles": [
+    "Gradual Alleles": [
       {
         "id": 1,
-        "name": "Allele Br5.Wh36",
+        "name": "Allele Br15.Wh36",
         "type": "coat",
-        "brownWeek": 5,
-        "brownRate": 1,
+        "brownWeek": 15,
+        "brownRate": 0.25,
         "whiteWeek": 36,
-        "whiteRate": 1,
+        "whiteRate": 0.25,
         "geneColor": "#ff0000"
       },
       {
         "id": 2,
-        "name": "Allele Br1.Wh36",
+        "name": "Allele Br24.Wh36",
         "type": "coat",
-        "brownWeek": 1,
-        "brownRate": 1,
+        "brownWeek": 24,
+        "brownRate": 0.25,
         "whiteWeek": 36,
-        "whiteRate": 1,
+        "whiteRate": 0.25,
         "geneColor": "#80ff00"
+      },
+      {
+        "id": 3,
+        "name": "Allele Br26.Wh36",
+        "type": "coat",
+        "brownWeek": 26,
+        "brownRate": 0.25,
+        "whiteWeek": 36,
+        "whiteRate": 0.25,
+        "geneColor": "#00ffff"
+      },
+      {
+        "id": 4,
+        "name": "Allele Br35.Wh36",
+        "type": "coat",
+        "brownWeek": 35,
+        "brownRate": 0.25,
+        "whiteWeek": 36,
+        "whiteRate": 0.25,
+        "geneColor": "#8000ff"
       }
     ]
   },
@@ -165,6 +185,34 @@ export default
         "generationGenerator": "GenerationEvery18Weeks",
         "seed": "some string"
       }
-    }
+    },
+    {
+      "name": "Semi-realistic Scenario",
+      "description": "Climate has gradual snow coverage and alleles have gradual color change. Selection with large population.",
+      "options": {
+        "selection": true,
+        "startWeek": 0,
+        "availableAlleles": "Gradual Alleles",
+        "carryingCapacity": 500,
+        "baseSurvivalRate": 0.96,
+        "mismatchPenalty": 0.07,
+        "climateGenerator": "RealisticStableClimate",
+        "generationGenerator": "GenerationEvery18Weeks"
+      }
+    },
+    {
+      "name": "Semi-realistic Variable Scenario",
+      "description": "Like the semi-realistic scenario but with a variable climate.",
+      "options": {
+        "selection": true,
+        "startWeek": 0,
+        "availableAlleles": "Gradual Alleles",
+        "carryingCapacity": 500,
+        "baseSurvivalRate": 0.96,
+        "mismatchPenalty": 0.07,
+        "climateGenerator": "RealisticVariableClimate",
+        "generationGenerator": "GenerationEvery18Weeks"
+      }
+    },
   ]
 }

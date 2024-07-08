@@ -12,7 +12,7 @@ import seedrandom from 'https://cdn.jsdelivr.net/npm/seedrandom@3.0.5/+esm';
 import { Simulation } from "./modules/simulation.js";
 import configFile from "../sim.config.js";
 import { makeAlleleGraphConfig, makeSnowGraphConfig } from './modules/graphs.js';
-import { IntegralStableClimate, IntegralVariableClimate } from "./modules/climate.js";
+import { IntegralStableClimate, IntegralVariableClimate, RealisticStableClimate, RealisticVariableClimate } from "./modules/climate.js";
 import { GenerateEvery18Weeks } from "./modules/generation.js";
 import hareGrid from "./modules/grid.js";
 
@@ -36,6 +36,8 @@ let selectedScenarioIndex = 0;
 let climateFunctions = {
     IntegralStableClimate: new IntegralStableClimate(0, 0),
     IntegralVariableClimate: new IntegralVariableClimate(0, 0),
+    RealisticStableClimate: new RealisticStableClimate(0, 0),
+    RealisticVariableClimate: new RealisticVariableClimate(0, 0),
 }
 let generationFunctions = {
     GenerationEvery18Weeks: new GenerateEvery18Weeks(0),
@@ -238,7 +240,7 @@ function updateLabels() {
         weekLabels.push(currentWeek);
     }
     // if the starting week was past when the snowless week was recorded
-    if (currentWeek % 52 === 0 && rawFirstSnowlessWeekData.length < currentYear) {
+    while (currentWeek % 52 === 0 && rawFirstSnowlessWeekData.length < currentYear) {
         rawFirstSnowlessWeekData.push(null);
     }
     if (yearLabels.length < currentYear - Math.floor(currentConfig.startWeek / 52)) {
@@ -404,7 +406,6 @@ function updateScenario() {
 
     // set the available alleles dropdown to the current scenario's available alleles
     const alleleSelect = form.elements['allele-set'];
-    console.log(alleleSelect.options);
     alleleSelect.value = scenarios[selectedScenarioIndex].options.alleleSetName;
     // set the climate and generation functions, matching by name
     const climateSelect = form.elements['climate-function'];
@@ -437,12 +438,11 @@ function advanceSimulation(animate = true) {
     if (advanceRateType === 'generations') {
         let generations = 0;
         while (generations < advanceRateValue) {
-            // check if the next advance will generate a new generation
+            simulation.advanceWeek();
             if (simulation.generationGenerator.shouldGenerate(simulation.week)) {
                 newGenerationWeeks.push(simulation.week);
                 generations++;
             }
-            simulation.advanceWeek();
             updateFreqGraphData();
             updateSnowGraphData();
             genotypeGrid.doTick();
