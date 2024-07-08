@@ -12,10 +12,11 @@
     <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <link rel="stylesheet" type="text/css" href="../css/wiki.css">
+    <script src="../js/wiki.js" defer></script>
 </head>
 <body>
     <nav class="wiki-nav">
-        <ul>
+        <ul class="nav-large">
             <li>
                 <h1>Evo</h1>
             </li>
@@ -26,19 +27,31 @@
                 <a class="nav-link" href="./">Wiki</a>
             </li>
         </ul>
+        <ul class="nav-small">
+            <li>
+                <a class="nav-link" href="../">Evo</a>
+            </li>
+            <li>
+                <button class="nav-toggle" id="nav-toggle">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"></path>
+                    </svg>
+                </button>
+            </li>
+        </ul>
     </nav>
     <div class="wiki-page">
         <main class="wiki-container">
             <!-- contents card for larger displays -->
-            <section class="wiki-sidebar wiki-card" id="large-contents">
+            <section class="wiki-sidebar wiki-card" id="header-contents" data-closed>
                 <h2>Contents</h2>
                 <ul>
-                    <li><a href="#about">About Evo</a></li>
-                    <li><a href="#controls">Controls</a></li>
-                    <li><a href="#config">Configuration</a></li>
-                    <li><a href="#visualizaitons">Visualizations</a></li>
-                    <li><a href="#advanced-config">Advanced Configuration</a></li>
-                    <li><a href="#references">References</a></li>
+                    <li><a class="wiki-link" href="#about">About Evo</a></li>
+                    <li><a class="wiki-link" href="#controls">Controls</a></li>
+                    <li><a class="wiki-link" href="#config">Configuration</a></li>
+                    <li><a class="wiki-link" href="#visualizaitons">Visualizations</a></li>
+                    <li><a class="wiki-link" href="#advanced-config">Advanced Configuration</a></li>
+                    <li><a class="wiki-link" href="#references">References</a></li>
                 </ul>
             </section>
             <article class="wiki-content-container wiki-card">
