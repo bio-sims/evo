@@ -54,6 +54,7 @@ export default class Grid {
         this.tooltipContent.classList.add("tooltip-content");
         this.tooltip.appendChild(this.tooltipContent);
 
+        this.tooltip.style.position = "fixed";
     }
     /**
      * Update tooltip content and image based on the hovered hare

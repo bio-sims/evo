@@ -98,7 +98,96 @@ class IntegralVariableClimate {
     }
 };
 
+// https://www.desmos.com/calculator/5hkioodkx6
+class RealisticStableClimate {
+    constructor(week, temperature) {
+        this.week = week;
+        this.temperature = temperature;
+        this.friendlyName = "Realistic Stable";
+        this.tempRange = 11;
+        this.tempOffset = 1;
+        // choose between 0 and 6
+        this.originalWeekOffset = Math.floor(Math.random() * 7);
+        this.weekOffset = this.originalWeekOffset;
+        this.updateTemperature();
+    }
+
+    updateTemperature() {
+        if (this.week % 52 === 0) {
+            // update weekoffset +/- 1 of the original offset at the start of the year
+            this.weekOffset = this.originalWeekOffset + Math.floor(Math.random() * 3) - 1;
+        }
+        const period = (2 * Math.PI * (this.week + this.weekOffset)) / 52;
+        this.temperature = -11 * Math.sin(period + Math.pow(Math.cos(period / 2), 2)) + this.tempOffset;
+    }
+
+    advanceWeek() {
+        this.week++;
+        this.updateTemperature();
+    }
+
+    // snow percentage is a function of temperature
+    getSnowCoverage() {
+        const snow = 1 / (1 + Math.exp(0.7 * (this.temperature + 2)));
+        if (snow < 0.01) {
+            return 0;
+        }
+        return snow;
+    }
+}
+
+class RealisticVariableClimate {
+    constructor(week, temperature) {
+        this.week = week;
+        this.temperature = temperature;
+        this.friendlyName = "Realistic Variable";
+        this.tempRange = 11;
+        this.tempOffset = 1;
+        // float between -2 and -1
+        this.originalWeekOffset = -1 - Math.random();
+        this.weekOffset = this.originalWeekOffset;
+        this.updateTemperature();
+    }
+
+    updateTemperature() {
+        if (this.week % 52 === 0) {
+            if (Math.random() < 0.2) {
+                // randomly increase or decrease by 0.25
+                if (Math.random() < 0.5) {
+                    this.weekOffset = Math.max(0, this.weekOffset - 0.5);
+                } else {
+                    this.weekOffset = Math.min(10, this.weekOffset + 0.5);
+                }
+            } else {
+                if (Math.random() < 0.25) {
+                    this.weekOffset = Math.max(0, this.weekOffset - 0.25);
+                } else {
+                    this.weekOffset = Math.min(10, this.weekOffset + 0.5);
+                }
+            }
+        }
+        const period = (2 * Math.PI * (this.week + this.weekOffset)) / 52;
+        this.temperature = -11 * Math.sin(period + Math.pow(Math.cos(period / 2), 2)) + this.tempOffset;
+    }
+
+    advanceWeek() {
+        this.week++;
+        this.updateTemperature();
+    }
+
+    // snow percentage is a function of temperature
+    getSnowCoverage() {
+        const snow = 1 / (1 + Math.exp(0.7 * (this.temperature + 2)));
+        if (snow < 0.01) {
+            return 0;
+        }
+        return snow;
+    }
+}
+
 export {
     IntegralStableClimate,
     IntegralVariableClimate,
+    RealisticStableClimate,
+    RealisticVariableClimate,
 };
