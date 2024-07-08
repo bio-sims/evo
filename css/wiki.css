@@ -3,6 +3,39 @@
     --cr-border-primary: rgb(208 215 222 / 70%);
     --cr-border-secondary: rgba(175, 184, 193, 0.20);
 }
+
+ul.nav-small {
+    display: none;
+    justify-content: space-between;
+}
+
+ul.nav-small button {
+    background-color: transparent;
+    color: var(--cr-text-primary);
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+ul.nav-small svg {
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+ul.nav-small a.nav-link:first-child {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+@media (width < 1000px) {
+    ul.nav-large {
+        display: none;
+    }
+    ul.nav-small {
+        display: flex;
+    }
+}
+
 div.wiki-page {
     display: flex;
     justify-content: center;
@@ -184,12 +217,25 @@ article.wiki-content-container {
 
 @media (width < 1000px) {
     nav.wiki-nav {
-        position: sticky;
-        top: 0;
-        overflow-y: visible;
-        overflow-x: hidden;
+        position: relative;
     }
-    #large-contents {
-        display: none;
+    #header-contents {
+        box-sizing: content-box;
+        position: absolute;
+        top: 5rem;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        max-height: 100vh;
+        overflow: hidden;
+        transition: max-height 0.5s ease-in-out;
+    }
+    #header-contents[data-closed] {
+        transition: padding 0.5s ease-in-out, max-height 0.5s ease-in-out;
+        max-height: 0;
+        padding: 0;
+        overflow: hidden;
     }
 }
