@@ -17,6 +17,70 @@ export default class Grid {
         this.container = document.getElementById(containerId);
         this.grid = [];
         this.initializeGrid();
+
+        // mouse over updates the tooltip position to mouse position
+        this.container.addEventListener("mouseover", (e) => {
+            this.tooltip.style.position = "fixed";
+            this.tooltip.style.top = `${e.clientY}px`;
+            // if the tool tip will go off the right side of the screen, move it to the left
+            if (e.clientX + this.tooltip.clientWidth > window.innerWidth) {
+                // if it can't go left, attach to the left side of the screen
+                if (e.clientX - this.tooltip.clientWidth < 0) {
+                    this.tooltip.style.left = "0";
+                    this.tooltip.style.right = "auto";
+                } else {
+                    // otherwise, attach to the left side of the mouse
+                    this.tooltip.style.right = `${window.innerWidth - e.clientX}px`;
+                    this.tooltip.style.left = "auto";
+                }
+            } else {
+                // otherwise, attach to the right side of the mouse
+                this.tooltip.style.left = `${e.clientX}px`;
+                this.tooltip.style.right = "auto";
+            }
+        });
+
+        // create the tooltip element
+        this.tooltip = document.createElement("div");
+        this.tooltip.classList.add("tooltip");
+        this.container.appendChild(this.tooltip);
+
+        this.tooltipImage = document.createElement("div");
+        this.tooltipImage.classList.add("grid-hare");
+        this.tooltipImage.classList.add("grid-hare--large");
+        this.tooltip.appendChild(this.tooltipImage);
+
+        this.tooltipContent = document.createElement("div");
+        this.tooltipContent.classList.add("tooltip-content");
+        this.tooltip.appendChild(this.tooltipContent);
+
+    }
+    /**
+     * Update tooltip content and image based on the hovered hare
+     * @param {Event} e - the mouseover event
+     * @param {number} id - the id of the hare to update the tooltip for
+     */
+    handleUpdateTooltip(e, id) {
+        const hare = this.hares[id];
+        const sortedAlleles = [...hare.alleles].sort((a, b) => a.id - b.id);
+        // update the tooltip content based on the hare
+        this.tooltipContent.innerHTML = `
+            <span><b>Alelle 1:</b> ${sortedAlleles[0].name} (${sortedAlleles[0].type})</span>
+            <span><b>Alelle 2:</b> ${sortedAlleles[1].name} (${sortedAlleles[1].type})</span>
+            <span><b>Whiteness:</b> ${Math.round(hare.whiteness * 100)}%</span>
+            <span><b>Alive:</b> ${hare.alive ? "Yes" : "No"}</span>
+        `;
+        if (hare.alive) {
+            this.tooltipContent.innerHTML += `<span><b>Mismatched:</b> ${hare.isMismatched(this.simulation.snowCoverage) ? "Yes" : "No"}</span>`;
+        } else {
+            this.tooltipContent.innerHTML += `<span><b>Died mismatched:</b> ${hare.wasMismatched ? "Yes" : "No"}</span>`;
+        }
+        // replace the tooltip image with the current hare
+        const hareImageContent = this.container.querySelector(`.grid-hare[data-id="${id}"]`).cloneNode(true);
+        this.tooltipImage.innerHTML = "";
+        for (let i = 0; i < hareImageContent.children.length; i++) {
+            this.tooltipImage.appendChild(hareImageContent.children[i].cloneNode(true));
+        }
     }
     /**
      * Generate an element representing a hare
@@ -42,51 +106,9 @@ export default class Grid {
         element.appendChild(whiteness);
         element.appendChild(secondAllele);
 
-        // create the tooltip element placeholder, needed for nice CSS animations
-        // consider creating the element on hover if performance is an issue and just do a fade in
-        const tooltip = document.createElement("div");
-        tooltip.classList.add("tooltip");
-        const tooltipImage = element.cloneNode(true);
-        const tooltipContent = document.createElement("div");
-        tooltipContent.classList.add("tooltip-content");
-        tooltip.appendChild(tooltipImage);
-        tooltip.appendChild(tooltipContent);
-        element.appendChild(tooltip);
-
         // update tooltip content only on mouseover (performance optimization)
         element.addEventListener("mouseover", (e) => {
-            // reset inline styles initially
-            tooltip.style.left = "";
-            tooltip.style.right = "";
-            // get the hare and the tooltip content
-            const hare = this.hares[id];
-            const tooltipContent = tooltip.querySelector(".tooltip-content");
-            const tooltipImage = tooltip.querySelector(".grid-hare");
-            // reuse the already present element, but remove the tooltip to avoid recursion
-            const tooltipStrippedHare = element.cloneNode(true);
-            tooltipStrippedHare.classList.add("grid-hare--large");
-            tooltipStrippedHare.querySelector(".tooltip").remove();
-            tooltipImage.replaceWith(tooltipStrippedHare);
-            // update the tooltip content based on the hare
-            tooltipContent.innerHTML = `
-                <span><b>Alelle 1:</b> ${hare.alleles[0].name} (${hare.alleles[0].type})</span>
-                <span><b>Alelle 2:</b> ${hare.alleles[1].name} (${hare.alleles[1].type})</span>
-                <span><b>Whiteness:</b> ${Math.round(hare.whiteness * 100)}%</span>
-                <span><b>Alive:</b> ${hare.alive ? "Yes" : "No"}</span>
-            `;
-            if (hare.alive) {
-                tooltipContent.innerHTML += `<span><b>Mismatched:</b> ${hare.isMismatched(this.simulation.snowCoverage) ? "Yes" : "No"}</span>`;
-            } else {
-                tooltipContent.innerHTML += `<span><b>Died mismatched:</b> ${hare.wasMismatched ? "Yes" : "No"}</span>`;
-            }
-            // move the tooltip to the right if itʻs overflowing the left side of the screen
-            const toolTipBounds = tooltip.getBoundingClientRect();
-            const gridItemBounds = element.getBoundingClientRect();
-            console.log(gridItemBounds, toolTipBounds);
-            if (toolTipBounds.left < 0) {
-                tooltip.style.left = `${0 - gridItemBounds.left}px`;
-                tooltip.style.right = "auto";
-            }
+            this.handleUpdateTooltip(e, id);
         });
         return element;
     };

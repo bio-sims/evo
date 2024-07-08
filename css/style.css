@@ -519,6 +519,7 @@ article.genotype-grid {
     margin-bottom: 2rem;
     max-height: 70vh;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .grid-hare {
@@ -533,10 +534,7 @@ article.genotype-grid {
     z-index: 1;
 }
 
-.grid-hare > .tooltip {
-    position: absolute;
-    bottom: 0;
-    right: 50%;
+article.genotype-grid > .tooltip {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -550,7 +548,8 @@ article.genotype-grid {
     border: 1px solid rgba(0, 0, 0, 0.30);
     border-radius: var(--br-radius-small);
     padding: 1rem;
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-out;
+    z-index: 1000;
 }
 
 .grid-hare:hover {
@@ -558,9 +557,8 @@ article.genotype-grid {
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2);
 }
 
-.grid-hare:hover > .tooltip {
+article.genotype-grid:hover > .tooltip {
     opacity: 1;
-    transform: translate3d(0, 100%, 0);
 }
 
 .tooltip > .tooltip-content {
