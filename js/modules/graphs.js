@@ -5,7 +5,6 @@
  */
 
 const displayWeek = (week, weekLabels) => {
-    console.log(week);
     if (weekLabels[weekLabels.length - 1] < 52) {
         return week;
     }
