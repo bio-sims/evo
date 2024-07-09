@@ -15,6 +15,7 @@ import { makeAlleleGraphConfig, makeSnowGraphConfig } from './modules/graphs.js'
 import { IntegralStableClimate, IntegralVariableClimate, RealisticStableClimate, RealisticVariableClimate } from "./modules/climate.js";
 import { GenerateEvery18Weeks } from "./modules/generation.js";
 import hareGrid from "./modules/grid.js";
+import { getThemeIconData, setupTheme, toggleTheme } from './modules/theme.js';
 
 // --- module scoped variables ---
 
@@ -52,7 +53,18 @@ for (const scenario of scenarios) {
     }
 }
 
+
+// --- theme setup ---
+setupTheme();
+document.getElementById('theme-icon-path').setAttribute('d', getThemeIconData());
+
 // --- chart.js global configuration ---
+function updateChartColors() {
+    const styles = getComputedStyle(document.documentElement);
+    Chart.defaults.color = styles.getPropertyValue('--cr-text-primary')
+    Chart.defaults.plugins.legend.labels.color = styles.getPropertyValue('--cr-text-primary');
+    Chart.defaults.borderColor = styles.getPropertyValue('--cr-bg-contrast');
+}
 Chart.defaults.elements.point.hitRadius = 8;
 
 // --- globals related to simulation control ---
@@ -185,13 +197,14 @@ function getColorHue(index) {
  * Creates new graphs that are initialized/zeroed at the current simulation week
  */
 function graphSetup() {
+    updateChartColors();
     if (!simulation) return;
     // set 52 weeks from the current week as the initial
     weekLabels = Array.from({ length: 52 }, (_, i) => i + simulation.week);
     yearLabels = Array.from({ length: 10 }, (_, i) => i + Math.floor(simulation.week / 52));
     newGenerationWeeks = [];
-    // frequency graph
 
+    // frequency graph
     if (alleleLineChart) alleleLineChart.destroy();
     const initialFrequency = simulation.getCoatAlleleFrequency();
     const alleleCtx = document.getElementById('allele-line-chart');
@@ -640,6 +653,14 @@ function main() {
         alleleLineChart = new Chart(document.getElementById('allele-line-chart'), graphConfig);
     };
 
+    const remakeSnowGraph = () => {
+        snowLineChart.destroy();
+        const graphConfig = makeSnowGraphConfig(isSnowLineChartYearly ? yearLabels : weekLabels,
+                                                isSnowLineChartYearly ? rawFirstSnowlessWeekData : rawSnowData,
+                                                isSnowLineChartYearly);
+        snowLineChart = new Chart(document.getElementById('snow-chart'), graphConfig);
+    };
+
     const toggleGraphStack = () => {
         isAlleleGraphArea = !isAlleleGraphArea;
         remakeAlleleGraph();
@@ -654,9 +675,7 @@ function main() {
     const toggleSnowData = () => {
         isSnowLineChartYearly = !isSnowLineChartYearly;
         snowLineChart.destroy();
-        const graphConfig = makeSnowGraphConfig(isSnowLineChartYearly ? yearLabels : weekLabels,
-                                                isSnowLineChartYearly ? rawFirstSnowlessWeekData : rawSnowData,
-                                                isSnowLineChartYearly);
+        remakeSnowGraph();
         snowLineChart = new Chart(document.getElementById('snow-chart'), graphConfig);
     }
 
@@ -782,6 +801,17 @@ function main() {
             }
         });
     }
+
+    // --- theme events ---
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        toggleTheme();
+        updateChartColors();
+        remakeAlleleGraph();
+        remakeSnowGraph();
+        // replace with svg of current theme
+        const themeSvgPath = document.getElementById('theme-icon-path');
+        themeSvgPath.setAttribute('d', getThemeIconData());
+    });
 }
 
 main();

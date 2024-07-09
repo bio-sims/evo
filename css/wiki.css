@@ -1,9 +1,7 @@
 /* some styles taken from GitHub markdown stylings */
 :root {
-    --cr-border-primary: rgb(208 215 222 / 70%);
-    --cr-border-secondary: rgba(175, 184, 193, 0.20);
+    transition: none;
 }
-
 ul.nav-small {
     display: none;
     justify-content: space-between;
@@ -20,6 +18,11 @@ ul.nav-small button {
 ul.nav-small svg {
     width: 2.5rem;
     height: 2.5rem;
+}
+
+#nav-toggle:hover {
+    background-color: transparent;
+    color: inherit;
 }
 
 ul.nav-small a.nav-link:first-child {
@@ -168,8 +171,9 @@ main.wiki-container {
 
 .wiki-card {
     flex: 1;
-    background-color: var(--cr-bg-secondary);
     border-radius: var(--br-radius-small);
+    background-color: var(--cr-bg-primary);
+    border: 1px solid var(--cr-border-primary);
 }
 
 @media (width >= 600px) {
@@ -222,20 +226,20 @@ article.wiki-content-container {
     #header-contents {
         box-sizing: content-box;
         position: absolute;
-        top: 5rem;
+        top: 4rem;
         left: 0;
         right: 0;
         z-index: 1000;
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
         padding: 1rem;
         max-height: 100vh;
         overflow: hidden;
-        transition: max-height 0.5s ease-in-out;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        opacity: 1;
+        transition: max-height 0.75s ease-in;
     }
     #header-contents[data-closed] {
-        transition: padding 0.5s ease-in-out, max-height 0.5s ease-in-out;
+        border: none;
         max-height: 0;
-        padding: 0;
-        overflow: hidden;
+        opacity: 0;
     }
 }

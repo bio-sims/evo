@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
     <title>Wiki | Evo</title>
     <meta property="og:title" content="Wiki | Evo">
@@ -10,9 +10,14 @@
     <meta property="theme-color" content="#a836ff">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
+    <!-- fonts and css -->
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <link rel="stylesheet" type="text/css" href="../css/wiki.css">
-    <script src="../js/wiki.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <!-- scripts -->
+    <script type="module" src="../js/wiki.js" defer></script>
 </head>
 <body>
     <nav class="wiki-nav">
@@ -26,12 +31,24 @@
             <li>
                 <a class="nav-link" href="./">Wiki</a>
             </li>
+            <li class="right-align">
+                <button class="svg-button" id="theme-toggle-large">
+                    <svg viewBox="0 0 24 24">
+                        <path id="theme-icon-path-large" d="" stroke-width="0.1" stroke="currentColor" fill="currentColor"></path>
+                    </svg>
+                </button>
+            </li>
         </ul>
         <ul class="nav-small">
             <li>
                 <a class="nav-link" href="../">Evo</a>
             </li>
-            <li>
+            <li class="right-align">
+                <button class="svg-button" id="theme-toggle-small">
+                    <svg viewBox="0 0 24 24">
+                        <path id="theme-icon-path-small" d="" stroke-width="0.1" stroke="currentColor" fill="currentColor"></path>
+                    </svg>
+                </button>
                 <button class="nav-toggle" id="nav-toggle">
                     <svg viewBox="0 0 24 24">
                         <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"></path>
