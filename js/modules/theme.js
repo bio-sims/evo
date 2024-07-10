@@ -9,6 +9,7 @@ function setupTheme() {
     document.documentElement.setAttribute('data-theme', theme);
   } else {
     document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
   }
 }
 
