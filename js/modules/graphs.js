@@ -41,7 +41,7 @@ const makeAlleleGraphConfig = (weekLabels, alleleGraphDatasets, useGenerations, 
                     ticks: {
                         callback: (val, index) => {
                             if (useGenerations) {
-                                return generationWeeks.includes(weekLabels[index]) ? `Gen ${generationWeeks.indexOf(weekLabels[index]) + 2}` : null;
+                                return generationWeeks.includes(weekLabels[index]) ? `Gen ${generationWeeks.indexOf(weekLabels[index]) + 1}` : null;
                             }
                             return displayWeek(weekLabels[index], weekLabels);
                         },

@@ -137,7 +137,7 @@ let isAlleleGraphPerGeneration = false;
  * If the graph should be stacked or not
  * @type {boolean}
  */
-let isAlleleGraphArea = false;
+let isAlleleGraphArea = true;
 /**
  * The raw allele frequency data for the allele graph
  * @type {Object[]}
@@ -202,7 +202,7 @@ function graphSetup() {
     // set 52 weeks from the current week as the initial
     weekLabels = Array.from({ length: 52 }, (_, i) => i + simulation.week);
     yearLabels = Array.from({ length: 10 }, (_, i) => i + Math.floor(simulation.week / 52));
-    newGenerationWeeks = [];
+    newGenerationWeeks = [simulation.week];
 
     // frequency graph
     if (alleleLineChart) alleleLineChart.destroy();
