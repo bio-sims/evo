@@ -78,6 +78,28 @@ div.wiki-page h1, h2 {
 
 div.wiki-page p {
     margin-bottom: 1rem;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+div.wiki-page p.info {
+    font-weight: 300;
+    font-style: italic;
+}
+
+div.wiki-page ul {
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+}
+
+div.wiki-page div.wiki-note {
+    border-left: 4px solid var(--cr-primary);
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+div.wiki-page div.wiki-note * {
+    margin: 0;
 }
 
 div.wiki-page table {
@@ -204,6 +226,7 @@ section.wiki-sidebar ul {
     gap: 0.5rem;
     list-style-type: none;
     padding: 0;
+    margin: 0;
 }
 
 section.wiki-sidebar a {
@@ -242,4 +265,26 @@ article.wiki-content-container {
         max-height: 0;
         opacity: 0;
     }
+}
+
+#genotype-grid-example {
+    display: flex;
+    margin: 2rem 0rem;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.hare-example {
+    flex: 1 1 0;
+    width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+}
+
+#genotype-grid-example .grid-hare--large.grid-hare--dead div {
+    opacity: 0.5;
 }
