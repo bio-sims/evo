@@ -71,17 +71,20 @@ export default class Grid {
             <span><b>Whiteness:</b> ${Math.round(hare.whiteness * 100)}%</span>
             <span><b>Alive:</b> ${hare.alive ? "Yes" : "No"}</span>
         `;
-        if (hare.alive) {
-            this.tooltipContent.innerHTML += `<span><b>Mismatched:</b> ${hare.isMismatched(this.simulation.snowCoverage) ? "Yes" : "No"}</span>`;
-        } else {
-            this.tooltipContent.innerHTML += `<span><b>Died mismatched:</b> ${hare.wasMismatched ? "Yes" : "No"}</span>`;
-        }
         // replace the tooltip image with the current hare
         const hareImageContent = this.container.querySelector(`.grid-hare[data-id="${id}"]`).cloneNode(true);
         this.tooltipImage.innerHTML = "";
         for (let i = 0; i < hareImageContent.children.length; i++) {
             this.tooltipImage.appendChild(hareImageContent.children[i].cloneNode(true));
         }
+        if (hare.alive) {
+            this.tooltipContent.innerHTML += `<span><b>Mismatched:</b> ${hare.isMismatched(this.simulation.snowCoverage) ? "Yes" : "No"}</span>`;
+            this.tooltipImage.classList.toggle("grid-hare--mismatch", hare.isMismatched(this.simulation.snowCoverage));
+        } else {
+            this.tooltipContent.innerHTML += `<span><b>Died mismatched:</b> ${hare.wasMismatched ? "Yes" : "No"}</span>`;
+            this.tooltipImage.classList.toggle("grid-hare--mismatch", hare.wasMismatched);
+        }
+        this.tooltipImage.classList.toggle("grid-hare--dead", !hare.alive);
     }
     /**
      * Generate an element representing a hare

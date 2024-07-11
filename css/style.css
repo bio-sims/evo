@@ -18,6 +18,7 @@ html[data-theme="light"] {
     --cr-accent: rgb(141, 100, 226);
     --br-radius-small: 0.25rem;
     --cr-warning: rgb(255, 0, 0);
+    --cr-caution: rgb(255, 165, 0);
     --cr-border-primary: rgb(208 215 222 / 70%);
     --cr-border-secondary: rgba(175, 184, 193, 0.20);
 }
@@ -27,12 +28,13 @@ html[data-theme="dark"] {
     --cr-text-contrast: rgb(17, 15, 13);
     --cr-bg-primary: rgb(13, 17, 23);
     --cr-bg-secondary: rgb(22, 27, 34);
-    --cr-bg-contrast: rgb(51, 51, 51);
+    --cr-bg-contrast: rgb(119, 119, 119);
     --cr-primary: rgb(60, 140, 219);
     --cr-secondary: rgb(156, 147, 235);
     --cr-accent: rgb(141, 100, 226);
     --br-radius-small: 0.25rem;
     --cr-warning: rgb(255, 0, 0);
+    --cr-caution: rgb(255, 165, 0);
     --cr-border-primary: rgb(48, 54, 61);
     --cr-border-secondary: rgba(175, 184, 193, 0.20);
 }
@@ -561,7 +563,8 @@ article.genotype-grid {
     position: relative;
     width: 2rem;
     height: 2rem;
-    border: 1px solid var(--cr-border-primary);
+    border: 2px solid var(--cr-bg-contrast);
+    border-radius: var(--br-radius-small);
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     transition: all 0.15s ease-in-out;
@@ -613,26 +616,39 @@ article.genotype-grid:hover > .tooltip {
 }
 
 .grid-hare--mismatch {
-    border: 3px solid var(--cr-warning);
+    border: 3px solid var(--cr-caution);
+    background-color: var(--cr-bg-contrast);
     padding: 0.1rem;
 }
 
 .grid-hare--dead {
-    opacity: 0.15;
+    background-color: black;
+    padding: 0.1rem;
+
 }
 
-.grid-hare--dead .tooltip > .grid-hare {
+.grid-hare--dead div {
+    opacity: 0.4;
+}
+
+.grid-hare--large div {
     opacity: 1;
 }
 
+.grid-hare--large.grid-hare--dead, .grid-hare--large.grid-hare--mismatch {
+    padding: 0.25rem;
+}
 
-.grid-hare--dead:hover {
-    opacity: 1;
+/* dead due to mismatch */
+
+.grid-hare--dead.grid-hare--mismatch {
+    border-color: var(--cr-warning);
 }
 
 .grid-hare--large {
     width: 4rem;
     height: 4rem;
+    padding: 0;
 }
 
 #weather-bar {
