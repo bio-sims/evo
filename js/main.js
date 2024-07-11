@@ -12,7 +12,7 @@ import seedrandom from 'https://cdn.jsdelivr.net/npm/seedrandom@3.0.5/+esm';
 import { Simulation } from "./modules/simulation.js";
 import configFile from "../sim.config.js";
 import { makeAlleleGraphConfig, makeSnowGraphConfig } from './modules/graphs.js';
-import { IntegralStableClimate, IntegralVariableClimate, RealisticStableClimate, RealisticVariableClimate } from "./modules/climate.js";
+import { IntegralStableClimate, IntegralWarmingClimate, RealisticStableClimate, RealisticWarmingClimate } from "./modules/climate.js";
 import { GenerateEvery18Weeks } from "./modules/generation.js";
 import hareGrid from "./modules/grid.js";
 import { getThemeIconData, setupTheme, toggleTheme } from './modules/theme.js';
@@ -36,9 +36,9 @@ let scenarios = configFile.scenarios;
 let selectedScenarioIndex = 0;
 let climateFunctions = {
     IntegralStableClimate: new IntegralStableClimate(0, 0),
-    IntegralVariableClimate: new IntegralVariableClimate(0, 0),
+    IntegralWarmingClimate: new IntegralWarmingClimate(0, 0),
     RealisticStableClimate: new RealisticStableClimate(0, 0),
-    RealisticVariableClimate: new RealisticVariableClimate(0, 0),
+    RealisticWarmingClimate: new RealisticWarmingClimate(0, 0),
 }
 let generationFunctions = {
     GenerationEvery18Weeks: new GenerateEvery18Weeks(0),

@@ -137,7 +137,12 @@ export default class Grid {
     doTick() {
         this.simulation.hares.forEach((hare) => {
             const oldHare = this.hares[hare.id];
+            // if the hare is the same as before, don't update
             if (oldHare && hare.equals(oldHare) && oldHare.wasMismatched === hare.isMismatched(this.simulation.snowCoverage)) {
+                return;
+            }
+            // dont update an already dead hare, as mismatch status should not change
+            if (oldHare && !oldHare.alive && !hare.alive) {
                 return;
             }
             let hareCopy = Object.assign(Object.create(Object.getPrototypeOf(hare)), hare);
