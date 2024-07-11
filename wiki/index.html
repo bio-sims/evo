@@ -137,9 +137,53 @@
                             </tbody>
                         </table>
                     </div>
-                    <h3>Genotype Grid</h3>
-                    <p>Displays a box for each hare present in the simulation. The left side of the box has two sections, both which display the genotypic coloring of the alleles possessed by the hare. The right side is a representation of the current whitness of the hare. Each box can be hovered for additional information of the hare, including the allele names, the exact whiteness percentage, its status of being alive, and if it is currently mistmatched</p>
-                    <p>As the simulation progresses, the boxes will be stylized differently to represent various states of the hares. A hare outlined in red is currently mismatched, while a greyed out hare is dead and will be replaced in the next generation. Dead hares will not update and will maintain their whiteness and note in the tooltip if they died while being mismatched. For convenience, a snow coverage bar is placed at the bottom of the grid with the current percentage of snow.</p>
+                    <h3 id="genotype-grid">Genotype Grid</h3>
+                    <p>The genotype grid contains a small box for each hare present in the simulation. The left side of the box has two sections, both which display the genotypic coloring of the alleles possessed by the hare. The right side is a representation of the current whitness of the hare. Each box can be hovered for additional information of the hare, including the allele names, the exact whiteness percentage, its status of being alive, and if it is currently mistmatched</p>
+                    <p>As the simulation progresses, the boxes will be stylized differently to represent various states of the hares.<p>
+                    <div class="wiki-note">
+                        <p><strong>Note</strong>: The following examples do not have hover functionality.</p>
+                    </div>
+                    <div id="genotype-grid-example">
+                        <div class="hare-example">
+                            <div class="grid-hare grid-hare--large">
+                                <div class="hare-allele" style="background-color: rgb(255, 0, 0);"></div>
+                                <div class="hare-whiteness" style="background-color: rgb(255, 255, 255);"></div>
+                                <div class="hare-allele" style="background-color: rgb(128, 0, 255);"></div>
+                            </div>
+                            <p class="info">Alive</p>
+                        </div>
+                        <div class="hare-example">
+                            <div class="grid-hare grid-hare--large grid-hare--dead">
+                                <div class="hare-allele" style="background-color: rgb(128, 255, 0);"></div>
+                                <div class="hare-whiteness" style="background-color: rgb(255, 255, 255);"></div>
+                                <div class="hare-allele" style="background-color: rgb(0, 255, 255);"></div>
+                            </div>
+                            <p class="info">Dead</p>
+                        </div>
+                        <div class="hare-example">
+                            <div class="grid-hare grid-hare--large grid-hare--mismatch">
+                                <div class="hare-allele" style="background-color: rgb(255, 0, 0);"></div>
+                                <div class="hare-whiteness" style="background-color: rgb(153, 94, 0);"></div>
+                                <div class="hare-allele" style="background-color: rgb(128, 255, 0);"></div>
+                            </div>
+                            <p class="info">Alive, Mismatched</p>
+                        </div>
+                        <div class="hare-example">
+                            <div class="grid-hare grid-hare--large grid-hare--mismatch grid-hare--dead">
+                                <div class="hare-allele" style="background-color: rgb(255, 0, 0);"></div>
+                                <div class="hare-whiteness" style="background-color: rgb(153, 94, 0);"></div>
+                                <div class="hare-allele" style="background-color: rgb(128, 255, 0);"></div>
+                            </div>
+                            <p class="info">Dead, Mismatched</p>
+                        </div>
+                    </div>
+                    <ul>
+                        <li><strong>Orange outline</strong>: The alive hare is mismatched with its environment.</li>
+                        <li><strong>Red outline</strong>: The hare died while being mismatched.</li>
+                        <li><strong>Inner black outline, lowered opacity</strong>: The hare is dead.</li>
+                    </ul>
+                    <p>Once dead, a hare will no longer update, meaning hares that die while being mismatched will correctly display this information without considering the current environment. When a new generation begins, all dead hares are swept and replaced with the new ones.</p>
+                    <p>A weather bar displaying the current snow coverage and its associated color is provided for convenience at the bottom of the grid.</p>
                     <h3>Snow Coverage Graph</h3>
                     <p>By default, the snow coverage graph displays the first week the simulation experiences snowless coverage in a year, with the y-axis representing the week of the year and the x-axis representing the year. The graph can be toggled to show the snow coverage for each week of the years which is available due to the simulations ability to work with more complicated climates than the defaults.</p>
                     <div class="flex-center">
