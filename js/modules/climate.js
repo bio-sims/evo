@@ -51,14 +51,13 @@ class IntegralStableClimate {
  * @implements {ClimateGenerator}
  * @param {number} week - The current week of the simulation
  * @param {number} temperature - The current temperature of the simulation
- * @todo Implement variable climate logic
  */
-class IntegralVariableClimate {
+class IntegralWarmingClimate {
     constructor(week, temperature) {
         this.week = week;
         this.temperature = temperature;
-        this.friendlyName = "Integral Variable";
-        this.initialSnowlessYearWeek = Math.floor(Math.random() * 2) + 28;
+        this.friendlyName = "Integral Warming";
+        this.initialSnowlessYearWeek = Math.floor(Math.random() * 2) + 30;
         this.currentSnowlessYearWeek = this.initialSnowlessYearWeek;
         this.snowWeek = 36;
         this.updateTemperature();
@@ -66,18 +65,20 @@ class IntegralVariableClimate {
     updateTemperature() {
         const yearWeek = this.week % 52;
         // choose a new snowless week if it is the start of the year
-        // have a 50% chance of changing the snowless week until the week has drifted to week 15
         let changeChance;
-        if (this.currentSnowlessYearWeek < 15) {
-            changeChance = 0.25;
+        let increaseChance;
+        if (this.currentSnowlessYearWeek < 20) {
+            changeChance = 0.9;
+            increaseChance = 0.2;
         } else if (this.currentSnowlessYearWeek < 10) {
-            changeChance = 0.05;
-        } else {
             changeChance = 0.5;
+            increaseChance = 0.5;
+        } else {
+            changeChance = 0.85;
+            increaseChance = 0.1;
         }
         if (yearWeek === 0 && Math.random() < changeChance) {
-            // have a 20% chance of increasing the snowless week
-            if (Math.random() < 0.2) {
+            if (Math.random() < increaseChance) {
                 this.currentSnowlessYearWeek = Math.min(51, this.currentSnowlessYearWeek + 1);
             } else {
                 this.currentSnowlessYearWeek = Math.max(0, this.currentSnowlessYearWeek - 1);
@@ -136,11 +137,11 @@ class RealisticStableClimate {
     }
 }
 
-class RealisticVariableClimate {
+class RealisticWarmingClimate {
     constructor(week, temperature) {
         this.week = week;
         this.temperature = temperature;
-        this.friendlyName = "Realistic Variable";
+        this.friendlyName = "Realistic Warming";
         this.tempRange = 11;
         this.tempOffset = 1;
         // float between -2 and -1
@@ -187,7 +188,7 @@ class RealisticVariableClimate {
 
 export {
     IntegralStableClimate,
-    IntegralVariableClimate,
+    IntegralWarmingClimate,
     RealisticStableClimate,
-    RealisticVariableClimate,
+    RealisticWarmingClimate,
 };

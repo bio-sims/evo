@@ -46,9 +46,9 @@ This is an array containing sets of scenario objects. These will be displayed in
 | Function Name           | Description |
 | ----------------------- | ----------- |
 | IntegralStableClimate   | Every year, the first snowless day will fall within +/- 1 of a randomly chosen base week between 21 and 28. |
-| IntegralVariableClimate | The first snowless day of the year drifts towards 0, slowing as it approaches it. Initial week is randomly between week 28 and 30. |
+| IntegralWarmingClimate | The first snowless day of the year drifts towards 0, slowing as it approaches it. Initial week is around 30. |
 | RealisticStableClimate  | Similar to its integral counterpart, but snow coverage is decimal. |
-| RealisticVariableClimate | Snow coverage is decimal and drifts, on average, considerably slower than its integral counterpart. |
+| RealisticWarmingClimate | Snow coverage is decimal and drifts, on average, considerably slower than its integral counterpart. |
 
 ##### Currently available generationGeneartors
 

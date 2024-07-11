@@ -145,7 +145,7 @@ export default
     },
     {
       "name": "Scenario 5",
-      "description": "Selection, large population, and a variable climate.",
+      "description": "Selection, large population, and a warming climate.",
       "options": {
         "selection": true,
         "startWeek": 0,
@@ -153,13 +153,13 @@ export default
         "carryingCapacity": 500,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
-        "climateGenerator": "IntegralVariableClimate",
+        "climateGenerator": "IntegralWarmingClimate",
         "generationGenerator": "GenerationEvery18Weeks"
       }
     },
     {
       "name": "Scenario 6",
-      "description": "Selection, small population, and a variable climate.",
+      "description": "Selection, small population, and a warming climate.",
       "options": {
         "selection": true,
         "startWeek": 0,
@@ -167,13 +167,13 @@ export default
         "carryingCapacity": 20,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
-        "climateGenerator": "IntegralVariableClimate",
+        "climateGenerator": "IntegralWarmingClimate",
         "generationGenerator": "GenerationEvery18Weeks"
       }
     },
     {
       "name": "Consistent Scenario",
-      "description": "Seed where earliest week allele recovers due to climate change. Selection, large population, and a variable climate.",
+      "description": "Seed where earliest week allele recovers due to climate change. Selection, large population, and a warming climate.",
       "options": {
         "selection": true,
         "startWeek": 0,
@@ -181,9 +181,9 @@ export default
         "carryingCapacity": 500,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
-        "climateGenerator": "IntegralVariableClimate",
+        "climateGenerator": "IntegralWarmingClimate",
         "generationGenerator": "GenerationEvery18Weeks",
-        "seed": "some string"
+        "seed": "hi"
       }
     },
     {
@@ -201,8 +201,8 @@ export default
       }
     },
     {
-      "name": "Semi-realistic Variable Scenario",
-      "description": "Like the semi-realistic scenario but with a variable climate.",
+      "name": "Semi-realistic Warming Scenario",
+      "description": "Like the semi-realistic scenario but with a warming climate.",
       "options": {
         "selection": true,
         "startWeek": 0,
@@ -210,7 +210,7 @@ export default
         "carryingCapacity": 500,
         "baseSurvivalRate": 0.96,
         "mismatchPenalty": 0.07,
-        "climateGenerator": "RealisticVariableClimate",
+        "climateGenerator": "RealisticWarmingClimate",
         "generationGenerator": "GenerationEvery18Weeks"
       }
     },
