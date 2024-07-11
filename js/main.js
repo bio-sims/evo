@@ -676,7 +676,6 @@ function main() {
         isSnowLineChartYearly = !isSnowLineChartYearly;
         snowLineChart.destroy();
         remakeSnowGraph();
-        snowLineChart = new Chart(document.getElementById('snow-chart'), graphConfig);
     }
 
     document.getElementById('toggle-stack').addEventListener('click', toggleGraphStack);
