@@ -9,10 +9,11 @@
 /* GLOBAL VARIABLES */
 html[data-theme="light"] {
     --cr-text-primary: rgb(17, 15, 13);
+    --cr-text-primary-faded: rgba(17, 15, 13, 0.6);
     --cr-text-contrast: rgb(255, 255, 255);
     --cr-bg-primary: rgb(255, 255, 255);
     --cr-bg-secondary: rgb(246, 248, 250);
-    --cr-bg-contrast: rgb(212, 212, 212);
+    --cr-bg-contrast: rgb(233, 233, 233);
     --cr-primary: rgb(60, 140, 219);
     --cr-secondary: rgb(156, 147, 235);
     --cr-accent: rgb(141, 100, 226);
@@ -25,10 +26,11 @@ html[data-theme="light"] {
 
 html[data-theme="dark"] {
     --cr-text-primary: rgb(255, 255, 255);
+    --cr-text-primary-faded: rgb(255, 255, 255, 0.6);
     --cr-text-contrast: rgb(17, 15, 13);
     --cr-bg-primary: rgb(13, 17, 23);
-    --cr-bg-secondary: rgb(22, 27, 34);
-    --cr-bg-contrast: rgb(119, 119, 119);
+    --cr-bg-secondary: rgb(41, 41, 41);
+    --cr-bg-contrast: rgb(61, 61, 61);
     --cr-primary: rgb(60, 140, 219);
     --cr-secondary: rgb(156, 147, 235);
     --cr-accent: rgb(141, 100, 226);
@@ -43,34 +45,35 @@ html[data-theme="dark"] {
     color: var(--cr-text-primary);
     background-color: var(--cr-bg-primary);
     transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+    --nav-height: 3rem;
 }
 
 *::-webkit-scrollbar {
-  width: 16px;
-  height: 16px
+    width: 16px;
+    height: 16px
 }
 
 .invisible-scrollbar::-webkit-scrollbar {
-  display: none
+    display: none
 }
 
 *::-webkit-scrollbar-track {
-  background-color: var(--cr-bg-primary)
+    background-color: var(--cr-bg-primary)
 }
 
 *::-webkit-scrollbar-thumb, *::-webkit-scrollbar-track {
-  border: 4px solid transparent;
-  background-clip: padding-box;
-  border-radius: 8px
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    border-radius: 8px
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: var(--cr-bg-contrast);
-  min-height: 40px
+    background-color: var(--cr-bg-contrast);
+    min-height: 40px
 }
 
 *::-webkit-scrollbar-corner {
-  background-color: transparent
+    background-color: transparent
 }
 
 
@@ -118,8 +121,7 @@ nav {
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    height: 3.75rem;
-    border-bottom: 1px solid var(--cr-border-primary);
+    height: var(--nav-height);
 }
 
 nav > h1 {
@@ -178,8 +180,9 @@ main.card-container {
     justify-content: flex-start;
     width: 100%;
     height: 100%;
-    padding: 1rem;
-    gap: 1rem;
+    padding: 0.5rem;
+    padding-top: 0;
+    gap: 0.5rem;
 }
 
 @media (width <= 1200px) {
@@ -199,7 +202,7 @@ main.card-container .card-panel {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     flex: 1;
 }
 
@@ -211,7 +214,7 @@ main.card-container .card-panel--main {
 @media (width > 1200px) {
     main.card-container .card-panel--main {
         position: sticky;
-        top: 1rem;
+        top: 2rem;
         align-self: flex-start;
         overflow-y: visible;
     }
@@ -295,59 +298,73 @@ details[open] > summary {
 
 .card-panel > .card.card-tabs {
     background-color: var(--cr-bg-primary);
-    border: none;
+    border: 1px solid var(--cr-border-primary);
     box-shadow: none;
     padding: 0;
 }
 
 .tab-list {
     display: flex;
+    flex: 1;
     flex-direction: row;
     justify-content: flex-start;
-    gap: 0.5rem;
-    overflow: visible;
-    z-index: 1;
+    background-color: var(--cr-bg-secondary);
+    border-radius: var(--br-radius-small) var(--br-radius-small) 0 0;
+    overflow: hidden;
+}
+
+.tab-list .tab-divider {
+    width: 1px;
+    align-self: stretch;
+    margin: 10px 0;
+    background-color: var(--cr-border-primary);
 }
 
 .tab-list button {
     position: relative;
-    color: var(--cr-text-primary);
-    background-color: var(--cr-bg-primary);
-    border-bottom: none;
-    border-radius: var(--br-radius-small) var(--br-radius-small) 0 0;
-    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    color: var(--cr-text-primary-faded);
+    border: none;
+    border-radius: 0;
     margin: 0;
+    gap: 0.5rem;
 }
 
-.tab-list button:hover {
-    background-color: inherit;
-    border-color: var(--cr-border-primary);
-    border-bottom-color: transparent;
+.tab-list button svg {
+    vertical-align: middle;
+    fill: currentColor;
+    height: 1.5rem;
+    width: 1.25rem;
+}
+
+.tab-list button:hover,
+.tab-list button.tab--active:hover {
     color: var(--cr-text-primary);
+    background-color: var(--cr-bg-contrast);
 }
 
 .tab-list button.tab--active {
+    color: var(--cr-text-primary);
     background-color: var(--cr-bg-secondary);
-    z-index: 1;
-    border: 1px solid var(--cr-border-primary);
-    border-bottom-color: transparent;
 }
 
 .card > div.canvas {
     color: var(--cr-text-primary);
-    min-height: 600px;
+    min-height: calc(80vh - var(--nav-height) - 1rem);
 }
 
 .card-panel > .card-tabs > section.card {
     display: none;
-    border-radius: 0 var(--br-radius-small) var(--br-radius-small) var(--br-radius-small);
+    border: none;
 }
 
 .card-panel > .card-tabs > section.card.card--active {
     display: flex;
 }
 
-.tab-content {
+section.card.tab-content {
+    padding-top: 1rem;
     gap: 1rem;
 }
 
@@ -414,6 +431,10 @@ form > .input-group {
 
 form > .input-group:last-of-type {
     margin-bottom: 1rem;
+}
+
+.input-group:first-of-type {
+    border-top: none;
 }
 
 form > .input-group output {
@@ -531,10 +552,6 @@ input[type="range"] {
 label {
     font-size: 1rem;
     font-weight: bold;
-}
-
-#control-form > .input-group:first-child {
-    border-top: none;
 }
 
 #control-form select {
@@ -686,6 +703,9 @@ div.card-progress > div {
 }
 
 button.svg-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: transparent;
     border: none;
     cursor: pointer;

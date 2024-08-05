@@ -62,6 +62,15 @@ const makeAlleleGraphConfig = (weekLabels, alleleGraphDatasets, useGenerations, 
                 legend: {
                     display: true,
                     text: "Relative Allele Frequency",
+                    labels: {
+                        font: {
+                            size: 14,
+                        },
+                        usePointStyle: true,
+                        pointStyle: "rectRounded",
+                        pointStyleWidth: 50,
+                        padding: 20,
+                    }
                 },
                 tooltip: {
                     callbacks: {

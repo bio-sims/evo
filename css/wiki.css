@@ -7,6 +7,10 @@ ul.nav-small {
     justify-content: space-between;
 }
 
+nav > ul.nav-small > li.right-align {
+    gap: 1rem;
+}
+
 ul.nav-small button {
     background-color: transparent;
     color: var(--cr-text-primary);
@@ -15,9 +19,9 @@ ul.nav-small button {
     margin: 0;
 }
 
-ul.nav-small svg {
-    width: 2.5rem;
-    height: 2.5rem;
+#nav-toggle svg {
+    width: 2.75rem;
+    height: 2.75rem;
 }
 
 #nav-toggle:hover {
@@ -181,13 +185,13 @@ main.wiki-container {
 
 @media (width >= 600px) {
     main.wiki-container {
-        padding: 1rem;
+        padding: 0 1rem 1rem;
     }
 }
 
 @media (width < 600px) {
     main.wiki-container {
-        padding: 0.25rem;
+        padding: 0 0.25rem 0.25rem;
     }
 }
 
@@ -206,7 +210,7 @@ main.wiki-container {
 
 @media (width < 600px) {
     .wiki-card {
-        padding: 0.5rem;
+        padding: 1rem;
     }
 }
 
@@ -249,7 +253,7 @@ article.wiki-content-container {
     #header-contents {
         box-sizing: content-box;
         position: absolute;
-        top: 4rem;
+        top: var(--nav-height);
         left: 0;
         right: 0;
         z-index: 1000;
@@ -264,6 +268,10 @@ article.wiki-content-container {
         border: none;
         max-height: 0;
         opacity: 0;
+    }
+    button.svg-button svg {
+        height: 2.25rem;
+        width: 2.25rem;
     }
 }
 
