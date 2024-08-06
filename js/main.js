@@ -9,13 +9,14 @@ import { Chart, LineController, LineElement, Filler, PointElement, LinearScale, 
 Chart.register(LineController, LineElement, Filler, PointElement, LinearScale, Title, CategoryScale, Legend, Tooltip);
 // js does not have a built-in way to seed Math.random, so we use a library
 import seedrandom from 'https://cdn.jsdelivr.net/npm/seedrandom@3.0.5/+esm';
-import { Simulation } from "./modules/simulation.js";
-import configFile from "../sim.config.js";
+import { Simulation } from './modules/simulation.js';
+import configFile from '../sim.config.js';
 import { makeAlleleGraphConfig, makeSnowGraphConfig } from './modules/graphs.js';
-import { IntegralStableClimate, IntegralWarmingClimate, RealisticStableClimate, RealisticWarmingClimate } from "./modules/climate.js";
-import { GenerateEvery18Weeks } from "./modules/generation.js";
-import hareGrid from "./modules/grid.js";
+import { IntegralStableClimate, IntegralWarmingClimate, RealisticStableClimate, RealisticWarmingClimate } from './modules/climate.js';
+import { GenerateEvery18Weeks } from './modules/generation.js';
+import hareGrid from './modules/grid.js';
 import { getThemeIconData, setupTheme, toggleTheme } from './modules/theme.js';
+import DropwdownButton from './modules/dropdownButton.js';
 
 // --- module scoped variables ---
 
@@ -353,6 +354,23 @@ function updateStatusPanel() {
 }
 
 /**
+ * Updates the play button based on the given state.
+ *
+ * @param {string} state - The state of the play button (e.g. stopped state)
+ * @return {void} This function does not return a value.
+ */
+function updatePlayButton(state) {
+    const playButton = document.getElementById('play-button');
+    if (state === 'play') {
+        playButton.querySelector('path').setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m3 14H9c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v6c0 .55-.45 1-1 1');
+        playButton.lastChild.textContent = 'Pause';
+    } else {
+        playButton.querySelector('path').setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 13.5v-7c0-.41.47-.65.8-.4l4.67 3.5c.27.2.27.6 0 .8l-4.67 3.5c-.33.25-.8.01-.8-.4');
+        playButton.lastChild.textContent = 'Play';
+    }
+}
+
+/**
  * Replaces/resets the current simulation with a new one based on the current configuration
  */
 function replaceSimulation() {
@@ -362,7 +380,7 @@ function replaceSimulation() {
         currentInterval = null;
     }
     // reset text regardless
-    document.getElementById('play-button').textContent = 'Play';
+    updatePlayButton('stop');
     // set the seed if it exists
     if (currentConfig.seed) {
         seedrandom(currentConfig.seed, { global: true });
@@ -581,7 +599,7 @@ function main() {
     const onPlayEnd = () => {
         clearInterval(currentInterval);
         currentInterval = null;
-        document.getElementById('play-button').textContent = 'Play';
+        updatePlayButton('stop');
         // re-enable the advance button
         document.getElementById('advance-button').disabled = false;
     }
@@ -622,7 +640,7 @@ function main() {
         } else {
             if (!validControlForm()) return;
             currentInterval = setInterval(() => runSimulation(e), playRate);
-            e.target.textContent = 'Stop';
+            updatePlayButton('play');
             // disable the advance button while the simulation is running
             document.getElementById('advance-button').disabled = true;
         }
@@ -811,6 +829,127 @@ function main() {
         const themeSvgPath = document.getElementById('theme-icon-path');
         themeSvgPath.setAttribute('d', getThemeIconData());
     });
+
+    // --- dropdown events ---
+    const exportAlleleChart = document.getElementById('export-allele-chart');
+    const exportSnowChart = document.getElementById('export-snow-chart');
+    const chartToJSON = (chart) => {
+        const data = {
+            labels: chart.data.labels,
+            datasets: chart.data.datasets.map((dataset) => {
+                return {
+                    label: dataset.label,
+                    data: dataset.data,
+                    borderColor: dataset.borderColor,
+                    backgroundColor: dataset.backgroundColor,
+                    fill: dataset.fill,
+                };
+            }),
+        };
+        return JSON.stringify(data);
+    }
+
+    const downloadData = (href, filename) => {
+        const hiddenAnchor = document.createElement('a');
+        hiddenAnchor.href = href;
+        hiddenAnchor.download = filename;
+        hiddenAnchor.click();
+    }
+
+    const createChartImage = (exportCanvas, imageType, quality) => {
+        const image = new Image();
+        image.src = `data:${imageType};base64,${exportCanvas.toDataURL(imageType, quality).split(',')[1]}`;
+        return image;
+    }
+
+    const openChartInNewTab = (image, filename) => {
+        const newTab = window.open();
+        newTab.document.write(image.outerHTML);
+        newTab.document.title = filename;
+    }
+
+    const createChartExportCanvas = (getChart) => {
+        const chart = getChart();
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = chart.width;
+        exportCanvas.height = chart.height;
+        const ctx = exportCanvas.getContext('2d');
+        ctx.drawImage(chart.canvas, 0, 0);
+        return exportCanvas;
+    }
+
+    const createChartExportCanvasWithWhiteBackground = (getChart) => {
+        const chart = getChart();
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = chart.width;
+        exportCanvas.height = chart.height;
+        const ctx = exportCanvas.getContext('2d');
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--cr-bg-primary');
+        ctx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+        ctx.drawImage(chart.canvas, 0, 0);
+        return exportCanvas;
+    }
+
+    const chartExportOptions = (getChart, chartName) => [
+        {
+            text: "Download PNG",
+            callback: () => {
+                const exportCanvas = createChartExportCanvas(getChart);
+                const image = exportCanvas.toDataURL('image/png');
+                downloadData(image, `${chartName}-${Date.now()}.png`);
+                exportCanvas.remove();
+            },
+        },
+        {
+            text: "Download JPEG",
+            callback: () => {
+                const exportCanvas = createChartExportCanvasWithWhiteBackground(getChart);
+                const image = exportCanvas.toDataURL('image/jpeg', 1);
+                downloadData(image, `${chartName}-${Date.now()}.jpeg`);
+                exportCanvas.remove();
+            },
+        },
+        {
+            text: "Download JSON",
+            callback: () => {
+                const json = chartToJSON(getChart());
+                const blob = new Blob([json], { type: 'application/json' });
+                downloadData(URL.createObjectURL(blob), `${chartName}-${Date.now()}.json`);
+            },
+        },
+        {
+            text: "PNG in New Tab",
+            link: true,
+            callback: () => {
+                const exportCanvas = createChartExportCanvas(getChart);
+                const image = createChartImage(exportCanvas, 'image/png');
+                openChartInNewTab(image, `${chartName}-${Date.now()}.png`);
+            },
+        },
+        {
+            text: "JPEG in New Tab",
+            link: true,
+            callback: () => {
+                const exportCanvas = createChartExportCanvasWithWhiteBackground(getChart);
+                const image = createChartImage(exportCanvas, 'image/jpeg', 1);
+                openChartInNewTab(image, `${chartName}-${Date.now()}.jpeg`);
+            },
+        },
+        {
+            text: "JSON in New Tab",
+            link: true,
+            callback: () => {
+                const json = chartToJSON(getChart());
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            },
+        },
+    ];
+
+    // pass chart as a getter in chartExportOptions to ensure up-to-date data
+    const alleleDropdownButton = new DropwdownButton(exportAlleleChart, chartExportOptions(() => alleleLineChart, 'allele-chart'));
+    const snowDropdownButton = new DropwdownButton(exportSnowChart, chartExportOptions(() => snowLineChart, 'snow-chart'));
 }
 
 main();

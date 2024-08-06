@@ -4,7 +4,6 @@
  * @module grid
  */
 
-
 export default class Grid {
     /**
      * Represents a grid for the simulation
