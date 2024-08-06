@@ -60,8 +60,6 @@ const makeAlleleGraphConfig = (weekLabels, alleleGraphDatasets, useGenerations, 
             },
             plugins: {
                 legend: {
-                    display: true,
-                    text: "Relative Allele Frequency",
                     labels: {
                         font: {
                             size: 14,
@@ -146,8 +144,11 @@ const makeSnowGraphConfig = (labels, rawSnowData, isYearly) => {
                         display: true,
                         text: isYearly ? "First Snowless Week" : "Snow Coverage",
                     },
+                    ticks: {
+                        stepSize: isYearly ? 3 : 0.1,
+                    },
                     min: 0,
-                    max: isYearly ? 52 : 1,
+                    max: isYearly ? 51 : 1,
                 },
             },
             plugins: {
@@ -161,6 +162,17 @@ const makeSnowGraphConfig = (labels, rawSnowData, isYearly) => {
                         }
                     },
                 },
+                legend: {
+                    labels: {
+                        font: {
+                            size: 14,
+                        },
+                        usePointStyle: true,
+                        pointStyle: "rectRounded",
+                        pointStyleWidth: 50,
+                        padding: 20,
+                    }
+                }
             },
         },
     };
