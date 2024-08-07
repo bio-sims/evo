@@ -10,11 +10,12 @@ export default class Grid {
      * @param {Simulation} simulation - the simulation to represent
      * @param {string} containerId - the id of the container element for the grid
     */
+    static MIN_SIZE = 32;
+    static MAX_SIZE = 96;
     constructor(simulation, containerId) {
         this.simulation = simulation;
         this.hares = {};
         this.container = document.getElementById(containerId);
-        this.grid = [];
         this.initializeGrid();
 
         // mouse over updates the tooltip position to mouse position
@@ -36,6 +37,14 @@ export default class Grid {
                 // otherwise, attach to the right side of the mouse
                 this.tooltip.style.left = `${e.clientX}px`;
                 this.tooltip.style.right = "auto";
+            }
+        });
+
+        this.previousWidth = this.container.clientWidth;
+        window.addEventListener("resize", () => {
+            if (this.container.clientWidth !== this.previousWidth) {
+                this.previousWidth = this.container.clientWidth;
+                this.resizeHares();
             }
         });
 
@@ -154,6 +163,7 @@ export default class Grid {
      * Update the grid display with the current internal state, NOT the simulation state
      */
     updateGrid() {
+        this.resizeHares();
         Object.values(this.hares).forEach((storedHare) => {
             if (!storedHare.shouldUpdate) return;
             const hareElement = this.container.children[storedHare.id];
@@ -176,5 +186,39 @@ export default class Grid {
                 hareElement.dispatchEvent(new Event("mouseover"));
             }
         });
+    }
+    /**
+     * Resizes the hares in the grid display.
+     * @param {number} containerHeight - the height of the container element
+     */
+    resizeHares() {
+        if (this.container.children.length === 0) return;
+        const containerMaxHeight = parseFloat(getComputedStyle(this.container).maxHeight);
+        const containerWidth = this.container.clientWidth;
+        const containerGap = parseFloat(getComputedStyle(this.container).gap);
+
+        // run binary search to find maximum size that doesn't cause overflow
+        let left = Grid.MIN_SIZE;
+        let right = Grid.MAX_SIZE;
+        let middle = Math.floor((left + right) / 2);
+        while (left < right - 1) {
+            const totalItemHeight = middle + containerGap;
+            const numRows = Math.ceil(this.container.children.length / Math.floor(containerWidth / totalItemHeight));
+            if (numRows * totalItemHeight <= containerMaxHeight) {
+                left = middle;
+            } else {
+                right = middle;
+            }
+            middle = Math.floor((left + right) / 2);
+        }
+
+        let newSize = middle;
+        this.container.style.gridTemplateColumns = `repeat(auto-fill, minmax(${newSize}px, 1fr))`;
+        // set the width and height of the hare elements
+        for (let element of this.container.children) {
+            if (!element.classList.contains("grid-hare")) continue;
+            element.style.width = `${newSize}px`;
+            element.style.height = `${newSize}px`;
+        }
     }
 }

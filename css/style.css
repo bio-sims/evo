@@ -585,14 +585,12 @@ label {
 }
 
 article.genotype-grid {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+    width: 100%;
     gap: 0.25rem;
-    padding: 0.25rem;
-    margin-bottom: 2rem;
-    max-height: 70vh;
+    justify-content: space-around;
+    max-height: calc(85vh - var(--nav-height) - 1rem);
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -696,10 +694,11 @@ article.genotype-grid:hover > .tooltip {
     align-items: center;
     width: 100%;
     height: 25px;
-    border-radius: 25px;
     border: 1px solid var(--cr-border-primary);
+    border-left: none;
+    border-right: none;
     transition: all 0.20s ease-in-out;
-    font-weight: bold;
+    font-weight: 500;
 }
 
 div.card-progress {
