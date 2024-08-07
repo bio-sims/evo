@@ -324,7 +324,7 @@ function updateWeatherBar() {
     if (!simulation) return;
     weatherBar.style.backgroundColor = `hsla(37, 100%, ${30 + (70 * simulation.snowCoverage)}%, 1)`;
     weatherBar.style.color = simulation.snowCoverage > 0.5 ? 'black' : 'white';
-    weatherBar.textContent = `Snow Coverage: ${Math.round(simulation.snowCoverage * 100)}%`;
+    weatherBar.textContent = `${Math.round(simulation.snowCoverage * 100)}%`;
 }
 
 /**
@@ -806,7 +806,7 @@ function main() {
             tab.classList.add('tab--active');
             tabContent.classList.add('card--active');
 
-            // update only the active tab content
+            // update only the active tab content (specific for only the main panel)
             currentTab = tab.dataset.tab;
             if (currentTab === 'frequency-graph') {
                 alleleLineChart.update();
