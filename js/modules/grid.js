@@ -11,7 +11,7 @@ export default class Grid {
      * @param {string} containerId - the id of the container element for the grid
     */
     static MIN_SIZE = 32;
-    static MAX_SIZE = 96;
+    static MAX_SIZE = 80;
     constructor(simulation, containerId) {
         this.simulation = simulation;
         this.hares = {};
