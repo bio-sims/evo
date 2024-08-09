@@ -172,7 +172,7 @@ export default
       }
     },
     {
-      "name": "Consistent Scenario",
+      "name": "Consistent",
       "description": "Seed where earliest week allele recovers due to climate change. Selection, large population, and a warming climate.",
       "options": {
         "selection": true,
@@ -187,7 +187,7 @@ export default
       }
     },
     {
-      "name": "Semi-realistic Scenario",
+      "name": "Dynamic",
       "description": "Climate has gradual snow coverage and alleles have gradual color change. Selection with large population.",
       "options": {
         "selection": true,
@@ -201,8 +201,8 @@ export default
       }
     },
     {
-      "name": "Semi-realistic Warming Scenario",
-      "description": "Like the semi-realistic scenario but with a warming climate.",
+      "name": "Dynamic Warming Climate",
+      "description": "Like the dynamic scenario but with a warming climate.",
       "options": {
         "selection": true,
         "startWeek": 0,
