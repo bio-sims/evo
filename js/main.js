@@ -178,7 +178,7 @@ let simulation = null;
  * id of the currently active tab
  * @type {string}
  */
-let currentTab = 'frequency-graph';
+let currentMainTab = 'frequency-graph';
 /**
  * The weather bar element
  * @type {HTMLElement|null}
@@ -281,7 +281,7 @@ function optimizeChart(chart) {
  */
 function updateFreqGraphData(refresh = false) {
     // only refresh if the tab is active
-    refresh = refresh && currentTab === 'frequency-graph';
+    refresh = refresh && currentMainTab === 'frequency-graph';
     // add the current allele frequencies to the chart
     if (!simulation) return;
     updateLabels();
@@ -301,7 +301,7 @@ function updateFreqGraphData(refresh = false) {
  */
 function updateSnowGraphData(refresh = false) {
     // only refresh if the tab is active
-    refresh = refresh && currentTab === 'snow-graph';
+    refresh = refresh && currentMainTab === 'snow-graph';
     if (!simulation) return;
     updateLabels();
     rawSnowData.push(simulation.snowCoverage);
@@ -497,19 +497,19 @@ function advanceSimulation(animate = true) {
     updateStatusPanel();
 
     // animate will be overwritten if animation is disabled on the graph itself
-    if (currentTab === 'frequency-graph') {
+    if (currentMainTab === 'frequency-graph') {
         if (animate) {
             alleleLineChart.update();
         } else {
             alleleLineChart.update('none');
         }
-    } else if (currentTab === 'snow-graph') {
+    } else if (currentMainTab === 'snow-graph') {
         if (animate) {
             snowLineChart.update();
         } else {
             snowLineChart.update('none');
         }
-    } else if (currentTab === 'hare-grid') {
+    } else if (currentMainTab === 'hare-grid') {
         genotypeGrid.updateGrid();
         updateWeatherBar();
     }
@@ -790,29 +790,43 @@ function main() {
 
     // --- tab events ---
 
-    const tabs = document.querySelectorAll('.tab');
-    for (const tab of tabs) {
-        tab.addEventListener('click', () => {
-            const tabContent = document.getElementById(tab.dataset.tab);
-            if (!tabContent) return;
-            // get the group and its current active tab/content
-            const tabGroup = tab.dataset.group;
-            const activeTab = document.querySelector(`.tab--active[data-group="${tabGroup}"]`);
-            const activeTabContent = document.getElementById(activeTab.dataset.tab);
-            if (!activeTab || !activeTabContent) return;
-            // move the active class to the clicked tab and its content
-            activeTab.classList.remove('tab--active');
-            activeTabContent.classList.remove('card--active');
-            tab.classList.add('tab--active');
-            tabContent.classList.add('card--active');
+    const tabs = document.querySelectorAll('.tab[data-tab]');
+    // group tabs by their data-group attribute
+    const tabGroups = Array.from(tabs).reduce((acc, tab) => {
+        const group = tab.dataset.group;
+        if (!acc[group]) acc[group] = [];
+        acc[group].push(tab);
+        return acc;
+    }, {});
 
-            // update only the active tab content (specific for only the main panel)
-            currentTab = tab.dataset.tab;
-            if (currentTab === 'frequency-graph') {
+    for (const tabGroup of Object.values(tabGroups)) {
+        for (const tab of tabGroup) {
+            tab.addEventListener('click', () => {
+                const tabContent = document.getElementById(tab.dataset.tab);
+                if (!tabContent) return;
+                // get the group and its current active tab/content
+                const tabGroup = tab.dataset.group;
+                const activeTab = document.querySelector(`.tab--active[data-group="${tabGroup}"]`);
+                const activeTabContent = document.getElementById(activeTab.dataset.tab);
+                if (!activeTab || !activeTabContent) return;
+                // move the active class to the clicked tab and its content
+                activeTab.classList.remove('tab--active');
+                activeTabContent.classList.remove('card--active');
+                tab.classList.add('tab--active');
+                tabContent.classList.add('card--active');
+            });
+        }
+    }
+
+    // main specific tab events
+    for (const tab of tabGroups.main) {
+        tab.addEventListener('click', () => {
+            currentMainTab = tab.dataset.tab;
+            if (currentMainTab === 'frequency-graph') {
                 alleleLineChart.update();
-            } else if (currentTab === 'snow-graph') {
+            } else if (currentMainTab === 'snow-graph') {
                 snowLineChart.update();
-            } else if (currentTab === 'hare-grid') {
+            } else if (currentMainTab === 'hare-grid') {
                 genotypeGrid.updateGrid();
                 updateWeatherBar();
             }
