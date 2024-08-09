@@ -12,6 +12,8 @@ html[data-theme="light"] {
     --cr-text-primary-faded: rgba(17, 15, 13, 0.6);
     --cr-text-contrast: rgb(255, 255, 255);
     --cr-bg-primary: rgb(255, 255, 255);
+    --cr-bg-primary-hover: rgba(0, 0, 0, 0.05);
+    --cr-bg-primary-hover-select: rgba(0, 0, 0, 0.03);
     --cr-bg-secondary: rgb(246, 248, 250);
     --cr-bg-contrast: rgb(233, 233, 233);
     --cr-primary: rgb(60, 140, 219);
@@ -20,7 +22,7 @@ html[data-theme="light"] {
     --br-radius-small: 0.25rem;
     --cr-warning: rgb(255, 0, 0);
     --cr-caution: rgb(255, 165, 0);
-    --cr-border-primary: rgb(208 215 222 / 70%);
+    --cr-border-primary: rgba(208, 215, 222, 0.7);
     --cr-border-secondary: rgba(175, 184, 193, 0.20);
 }
 
@@ -29,6 +31,8 @@ html[data-theme="dark"] {
     --cr-text-primary-faded: rgb(255, 255, 255, 0.6);
     --cr-text-contrast: rgb(17, 15, 13);
     --cr-bg-primary: rgb(13, 17, 23);
+    --cr-bg-primary-hover: rgb(41, 41, 41);
+    --cr-bg-primary-hover-select: rgb(48, 48, 48);
     --cr-bg-secondary: rgb(41, 41, 41);
     --cr-bg-contrast: rgb(61, 61, 61);
     --cr-primary: rgb(60, 140, 219);
@@ -94,9 +98,12 @@ button {
 }
 
 button:not(:disabled):hover {
-    background-color: var(--cr-primary);
-    border-color: var(--cr-primary);
-    color: var(--cr-text-contrast);
+    background-color: var(--cr-bg-contrast);
+}
+
+button:not(:disabled):active {
+    background-color: var(--cr-bg-primary-hover-select);
+    border-color: var(--cr-bg-primary-hover-select);
 }
 
 button:disabled {
@@ -335,6 +342,10 @@ details[open] > summary {
     background-color: var(--cr-bg-contrast);
 }
 
+.tab-list button:active {
+    background-color: var(--cr-bg-primary-hover-select);
+}
+
 .tab-list button.tab--active {
     color: var(--cr-text-primary);
     background-color: var(--cr-bg-secondary);
@@ -385,11 +396,6 @@ button.icon-button svg {
     width: 1.25rem;
 }
 
-/* button.icon-button:hover {
-    color: var(--cr-text-primary);
-    background-color: var(--cr-bg-contrast);
-} */
-
 #preset-container {
     display: flex;
     flex-direction: column;
@@ -399,20 +405,36 @@ button.icon-button svg {
 }
 
 #preset-container > .preset-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    align-items: center;
     width: 100%;
     padding: 1rem;
-    border-bottom: 1px solid var(--cr-border-primary);
+    border: 1px solid transparent;
+    border-bottom-color: var(--cr-border-primary);
     cursor: pointer;
+    user-select: none;
 }
 
-#preset-container > .preset-entry:last-of-type {
-    border-bottom: none;
+#preset-container > .preset-entry:hover {
+    background-color: var(--cr-bg-primary-hover);
+}
+
+#preset-container > .preset-entry:has(+.preset-entry--selected) {
+    border-bottom-color: transparent;
 }
 
 #preset-container > .preset-entry--selected {
-    background-color: var(--cr-primary);
     border-radius: var(--br-radius-small);
-    color: var(--cr-text-contrast);
+    border-color: transparent;
+    color: var(--text-primary);
+    background-color: var(--cr-bg-primary-hover);
+}
+
+#preset-container > .preset-entry--selected.preset-entry--selected:hover {
+    background-color: var(--cr-bg-primary-hover-select);
 }
 
 form {
@@ -758,7 +780,7 @@ button.svg-button > svg {
     background-color: var(--cr-bg-primary);
     border: 1px solid var(--cr-border-primary);
     border-radius: var(--br-radius-small);
-    padding: 0.5rem;
+    padding: 0rem;
     pointer-events: none;
     z-index: 1;
     transition: opacity 0.15s ease-in-out;
@@ -769,7 +791,7 @@ button.svg-button > svg {
     opacity: 1;
 }
 
-.dropdown-button > .dropdown-content button {
+.dropdown-content button {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -778,7 +800,6 @@ button.svg-button > svg {
     width: 100%;
     padding: 0.5rem 1rem;
     background-color: var(--cr-bg-primary);
-    color: var(--cr-text-primary);
     border: none;
     border-radius: var(--br-radius-small);
     cursor: pointer;
@@ -787,9 +808,4 @@ button.svg-button > svg {
     line-height: 1.25rem;
     text-wrap: nowrap;
     transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-}
-
-.dropdown-button > .dropdown-content button:hover {
-    background-color: var(--cr-primary);
-    color: var(--cr-text-contrast);
 }
