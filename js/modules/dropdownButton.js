@@ -4,16 +4,20 @@
  * @module dropdownButton
  */
 
-export default class DropwdownButton {
+export default class DropdownButton {
     /**
      * Create a dropdown button
      * @param {element} element - the element to attach the dropdown to
      * @param {Array<Object<{text: string, callback: Function}>>} list - list of objects with display text and a callback function
      * @param {boolean} closeOnClick - if choosing from the list should close the dropdown
+     * @param {boolean} above - if the list should appear above the button
+     * @param {boolean} left - if the list should appear left-aligned
      */
-    constructor(element, list, closeOnClick = true, above = true) {
+    constructor(element, list, { closeOnClick = true, above = false, left = false } = {}) {
         this.list = list;
+        this.closeOnClick = closeOnClick;
         this.above = above;
+        this.left = left;
         this.isOpen = false;
         this.button = element;
         this.button.addEventListener("click", () => this.toggleList());
@@ -63,6 +67,13 @@ export default class DropwdownButton {
                 this.dropdown.style.bottom = `${this.button.offsetHeight + 4}px`;
             } else {
                 this.dropdown.style.top = `${this.button.offsetHeight + 4}px`;
+            }
+            if (this.left) {
+                this.dropdown.style.left = "0";
+                this.dropdown.style.right = "auto";
+            } else {
+                this.dropdown.style.left = "auto";
+                this.dropdown.style.right = "0";
             }
             this.dropdown.classList.toggle("show", this.isOpen);
         }

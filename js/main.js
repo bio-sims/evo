@@ -16,7 +16,7 @@ import { IntegralStableClimate, IntegralWarmingClimate, RealisticStableClimate, 
 import { GenerateEvery18Weeks } from './modules/generation.js';
 import hareGrid from './modules/grid.js';
 import { getThemeIconData, setupTheme, toggleTheme } from './modules/theme.js';
-import DropwdownButton from './modules/dropdownButton.js';
+import DropdownButton from './modules/dropdownButton.js';
 
 // --- module scoped variables ---
 
@@ -962,8 +962,8 @@ function main() {
     ];
 
     // pass chart as a getter in chartExportOptions to ensure up-to-date data
-    const alleleDropdownButton = new DropwdownButton(exportAlleleChart, chartExportOptions(() => alleleLineChart, 'allele-chart'));
-    const snowDropdownButton = new DropwdownButton(exportSnowChart, chartExportOptions(() => snowLineChart, 'snow-chart'));
+    const alleleDropdownButton = new DropdownButton(exportAlleleChart, chartExportOptions(() => alleleLineChart, 'allele-chart'), { closeOnClick: true, above: true, left: false });
+    const snowDropdownButton = new DropdownButton(exportSnowChart, chartExportOptions(() => snowLineChart, 'snow-chart'), { closeOnClick: true, above: true, left: false });
 }
 
 main();
