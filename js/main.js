@@ -100,7 +100,7 @@ let doEndCondition = true;
  * The number of advances to make before stopping the interval
  * @type {number}
  */
-let endConditionValue = 1;
+let endConditionValue = 50;
 /**
  * The rate at which the simulation advances in milliseconds
  * @type {number}
@@ -363,7 +363,7 @@ function updatePlayButton(state) {
     const playButton = document.getElementById('play-button');
     if (state === 'play') {
         playButton.querySelector('path').setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m3 14H9c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v6c0 .55-.45 1-1 1');
-        playButton.lastChild.textContent = 'Pause';
+        playButton.lastChild.textContent = 'Stop';
     } else {
         playButton.querySelector('path').setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 13.5v-7c0-.41.47-.65.8-.4l4.67 3.5c.27.2.27.6 0 .8l-4.67 3.5c-.33.25-.8.01-.8-.4');
         playButton.lastChild.textContent = 'Play';
@@ -465,10 +465,10 @@ function toggleInputGroup(element, enabled) {
  * Advances the simulation by the current advance rate
  * @param {bool} animate - Whether to animate the graph update, may be overridden by the graph itself
  */
-function advanceSimulation(animate = true) {
-    if (advanceRateType === 'generations') {
+function advanceSimulation(animate = true, type = advanceRateType, value = advanceRateValue) {
+    if (type === 'generations') {
         let generations = 0;
-        while (generations < advanceRateValue) {
+        while (generations < value) {
             simulation.advanceWeek();
             if (simulation.generationGenerator.shouldGenerate(simulation.week)) {
                 newGenerationWeeks.push(simulation.week);
@@ -479,8 +479,8 @@ function advanceSimulation(animate = true) {
             genotypeGrid.doTick();
         }
     } else {
-        let numWeeks = advanceRateValue;
-        if (advanceRateType === 'years') {
+        let numWeeks = value;
+        if (type === 'years') {
             numWeeks *= 52;
         }
         for (let i = 0; i < numWeeks; i++) {
@@ -600,8 +600,8 @@ function main() {
         clearInterval(currentInterval);
         currentInterval = null;
         updatePlayButton('stop');
-        // re-enable the advance button
-        document.getElementById('advance-button').disabled = false;
+        // re-enable the skip button
+        document.getElementById('skip-button').disabled = false;
     }
 
     const validControlForm = () => {
@@ -610,11 +610,6 @@ function main() {
             return false;
         }
         return true;
-    }
-
-    const handleAdvance = (e) => {
-        if (!validControlForm()) return;
-        advanceSimulation();
     }
 
     const runSimulation = (e) => {
@@ -641,8 +636,8 @@ function main() {
             if (!validControlForm()) return;
             currentInterval = setInterval(() => runSimulation(e), playRate);
             updatePlayButton('play');
-            // disable the advance button while the simulation is running
-            document.getElementById('advance-button').disabled = true;
+            // disable the skip button while the simulation is running
+            document.getElementById('skip-button').disabled = true;
         }
     };
 
@@ -651,11 +646,9 @@ function main() {
         populationWiped = false;
         updateProgressBar(controlPlayProgressBar, runCount, endConditionValue);
         replaceSimulation();
-        // re-enable the advance button
-        document.getElementById('advance-button').disabled = false;
+        document.getElementById('skip-button').disabled = false;
     };
 
-    document.getElementById('advance-button').addEventListener('click', handleAdvance);
     document.getElementById('play-button').addEventListener('click', togglePlaySimulation);
     document.getElementById('reset-button').addEventListener('click', resetSimulation);
 
@@ -786,6 +779,16 @@ function main() {
             clearInterval(currentInterval);
             currentInterval = setInterval(() => runSimulation(e), playRate);
         }
+    });
+
+    const timeSkipForm = document.getElementById('time-skip-form');
+    timeSkipForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const skipValue = parseInt(formData.get('time-skip-value'));
+        if (isNaN(skipValue)) return;
+        const skipType = formData.get('time-skip-type');
+        advanceSimulation(true, skipType, skipValue);
     });
 
     // --- tab events ---
