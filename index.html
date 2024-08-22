@@ -89,7 +89,7 @@
                         <form id="control-form">
                             <div class="input-group">
                                 <div class="input-group-half">
-                                    <label for="advance-rate-value">Time step interval </label>
+                                    <label for="advance-rate-value">Timestep interval </label>
                                 </div>
                                 <div class="input-group-half right-align">
                                     <input type="number" id="advance-rate-value" name="advance-rate-value" value="1" min="1" max="1000" required>
@@ -100,17 +100,9 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="input-group">
-                                <div class="input-group-half">
-                                    <label for="do-end-condition">Limit played time steps</label>
-                                </div>
-                                <div class="input-group-half right-align">
-                                    <input type="checkbox" id="do-end-condition" name="do-end-condition">
-                                </div>
-                            </div>
                             <div class="input-group" id="input-group-end-condition">
                                 <div class="input-group-half">
-                                    <label for="end-condition-value">Time steps to play</label>
+                                    <label for="end-condition-value">Max number of timesteps</label>
                                 </div>
                                 <div class="input-group-half right-align">
                                     <div class="annotated-input">
@@ -135,17 +127,23 @@
                     </div>
                     <div class="tab-footer">
                         <div class="buttons buttons-center" id="control-buttons">
+                            <button id="reset-button" class="icon-button">
+                                <svg focusable="false" viewBox="0 0 24 24">
+                                    <path d="M12 5V3.21c0-.45-.54-.67-.85-.35l-2.8 2.79c-.2.2-.2.51 0 .71l2.79 2.79c.32.31.86.09.86-.36V7c3.31 0 6 2.69 6 6 0 2.72-1.83 5.02-4.31 5.75-.42.12-.69.52-.69.95 0 .65.62 1.16 1.25.97C17.57 19.7 20 16.64 20 13c0-4.42-3.58-8-8-8m-6 8c0-1.34.44-2.58 1.19-3.59.3-.4.26-.95-.09-1.31-.42-.42-1.14-.38-1.5.1-1 1.34-1.6 3-1.6 4.8 0 3.64 2.43 6.7 5.75 7.67.63.19 1.25-.32 1.25-.97 0-.43-.27-.83-.69-.95C7.83 18.02 6 15.72 6 13"></path>
+                                </svg>
+                                Reset
+                            </button>
                             <button id="play-button" class="icon-button">
                                 <svg focusable="false" viewBox="0 0 24 24">
                                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 13.5v-7c0-.41.47-.65.8-.4l4.67 3.5c.27.2.27.6 0 .8l-4.67 3.5c-.33.25-.8.01-.8-.4"></path>
                                 </svg>
                                 Play
                             </button>
-                            <button id="reset-button" class="icon-button">
+                            <button id="stop-button" class="icon-button" disabled>
                                 <svg focusable="false" viewBox="0 0 24 24">
-                                    <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L3.71 8.71C3.08 8.08 2 8.52 2 9.41V15c0 .55.45 1 1 1h5.59c.89 0 1.34-1.08.71-1.71l-1.91-1.91c1.39-1.16 3.16-1.88 5.12-1.88 3.16 0 5.89 1.84 7.19 4.5.27.56.91.84 1.5.64.71-.23 1.07-1.04.75-1.72C20.23 10.42 16.65 8 12.5 8"></path>
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m3 14H9c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v6c0 .55-.45 1-1 1"></path>
                                 </svg>
-                                Reset
+                                Stop
                             </button>
                         </div>
                     </div>
