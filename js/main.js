@@ -154,7 +154,10 @@ let rawSnowData = [];
  * @type {number[]}
  */
 let rawFirstSnowlessWeekData = [];
-
+/**
+ * The raw population data
+ */
+let rawPopulationData = [];
 /**
  * The chart object for displaying the allele frequencies
  * @type {Chart|null}
@@ -242,6 +245,7 @@ function graphSetup() {
     const snowCtx = document.getElementById('snow-chart');
     rawSnowData = [simulation.snowCoverage];
     rawFirstSnowlessWeekData = [];
+    rawPopulationData = [simulation.getAliveHares().length];
     const graphConfig = makeSnowGraphConfig(isSnowLineChartYearly ? yearLabels : weekLabels,
                                             isSnowLineChartYearly ? rawFirstSnowlessWeekData : rawSnowData,
                                             isSnowLineChartYearly);
@@ -483,6 +487,7 @@ function advanceSimulation(animate = true, type = advanceRateType, value = advan
             }
             updateFreqGraphData();
             updateSnowGraphData();
+            rawPopulationData.push(simulation.getAliveHares().length);
             genotypeGrid.doTick();
         }
     } else {
@@ -497,6 +502,7 @@ function advanceSimulation(animate = true, type = advanceRateType, value = advan
             simulation.advanceWeek();
             updateFreqGraphData();
             updateSnowGraphData();
+            rawPopulationData.push(simulation.getAliveHares().length);
             genotypeGrid.doTick();
         }
     }
@@ -911,6 +917,29 @@ function main() {
         return exportCanvas;
     }
 
+    const generateCSVText = () => {
+        const sortedAlleles = simulation.availableAlleles.sort((a, b) => a.id - b.id);
+        const sortedDatasets = alleleGraphDatasets.sort((a, b) => a.id - b.id);
+        // generate headers
+        let csvContent = 'Year,Week,Generation,Population Size,Snow Coverage,';
+        for (const allele of sortedAlleles) {
+            csvContent += `${allele.name},`;
+        }
+        // remove trailing comma
+        csvContent = csvContent.slice(0, -1);
+        csvContent += '\n';
+        // generate data
+        for (let i = 0; i < alleleGraphDatasets[0].data.length; i++) {
+            csvContent += `${Math.floor(i / 52)},${i % 52},${Math.floor(i / 52) * 10},${rawPopulationData[i]},${rawSnowData[i]},`;
+            for (const dataset of sortedDatasets) {
+                csvContent += `${dataset.data[i]},`;
+            }
+            csvContent = csvContent.slice(0, -1);
+            csvContent += '\n';
+        }
+        return csvContent;
+    }
+
     const chartExportOptions = (getChart, chartName) => [
         {
             text: "Download PNG",
@@ -939,6 +968,14 @@ function main() {
             },
         },
         {
+            text: "Download CSV",
+            callback: () => {
+                const csvContent = generateCSVText();
+                const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+                downloadData(URL.createObjectURL(csvBlob), `${chartName}-${Date.now()}.csv`);
+            },
+        },
+        {
             text: "PNG in New Tab",
             link: true,
             callback: () => {
@@ -963,6 +1000,16 @@ function main() {
                 const json = chartToJSON(getChart());
                 const blob = new Blob([json], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            },
+        },
+        {
+            text: "CSV in New Tab",
+            link: true,
+            callback: () => {
+                const csvContent = generateCSVText();
+                const csvBlob = new Blob([csvContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(csvBlob);
                 window.open(url, '_blank');
             },
         },
