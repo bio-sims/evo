@@ -79,7 +79,7 @@ let advanceRateValue = 1;
  * The type of advance rate
  * @type {'weeks'|'generations'|'years'}
  */
-let advanceRateType = 'weeks';
+let advanceRateType = 'years';
 /**
  * Holds current interval ID for the simulation
  * @type {number|null}
@@ -184,6 +184,11 @@ let currentMainTab = 'frequency-graph';
  * @type {HTMLElement|null}
  */
 let weatherBar = null;
+/**
+ * The number of times the simulation has run in the current interval
+ * @type {number}
+*/
+let runCount = 0;
 
 /**
  * Returns the default hue value for a given index in the available alleles array
@@ -362,8 +367,8 @@ function updateStatusPanel() {
 function updatePlayButton(state) {
     const playButton = document.getElementById('play-button');
     if (state === 'play') {
-        playButton.querySelector('path').setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m3 14H9c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v6c0 .55-.45 1-1 1');
-        playButton.lastChild.textContent = 'Stop';
+        playButton.querySelector('path').setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 14c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1m4 0c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1');
+        playButton.lastChild.textContent = 'Pause';
     } else {
         playButton.querySelector('path').setAttribute('d', 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m-2 13.5v-7c0-.41.47-.65.8-.4l4.67 3.5c.27.2.27.6 0 .8l-4.67 3.5c-.33.25-.8.01-.8-.4');
         playButton.lastChild.textContent = 'Play';
@@ -379,6 +384,8 @@ function replaceSimulation() {
         clearInterval(currentInterval);
         currentInterval = null;
     }
+    runCount = 0;
+    updateProgressBar(document.querySelector('#play-progress-bar > div'), runCount, endConditionValue);
     // reset text regardless
     updatePlayButton('stop');
     // set the seed if it exists
@@ -590,12 +597,6 @@ function main() {
 
     // simulation control button events
 
-    /**
-     * The number of times the simulation has run in the current interval
-     * @type {number}
-    */
-   let runCount = 0;
-
     const onPlayEnd = () => {
         clearInterval(currentInterval);
         currentInterval = null;
@@ -614,8 +615,12 @@ function main() {
 
     const runSimulation = (e) => {
         if (doEndCondition && runCount >= endConditionValue) {
+            runCount = 0;
+            document.getElementById('stop-button').disabled = true;
             onPlayEnd();
         } else if (simulation.hares.length === 0) {
+            runCount = 0;
+            document.getElementById('stop-button').disabled = true;
             populationWiped = true;
             onPlayEnd();
         } else {
@@ -628,7 +633,6 @@ function main() {
     };
 
     const togglePlaySimulation = (e) => {
-        runCount = 0;
         updateProgressBar(controlPlayProgressBar, runCount, endConditionValue);
         if (currentInterval) {
             onPlayEnd();
@@ -636,9 +640,17 @@ function main() {
             if (!validControlForm()) return;
             currentInterval = setInterval(() => runSimulation(e), playRate);
             updatePlayButton('play');
+            document.getElementById('stop-button').disabled = false;
             // disable the skip button while the simulation is running
             document.getElementById('skip-button').disabled = true;
         }
+    };
+
+    const handleStopSimulation = (e) => {
+        runCount = 0;
+        onPlayEnd();
+        updateProgressBar(controlPlayProgressBar, runCount, endConditionValue);
+        e.target.disabled = true;
     };
 
     const resetSimulation = () => {
@@ -647,9 +659,11 @@ function main() {
         updateProgressBar(controlPlayProgressBar, runCount, endConditionValue);
         replaceSimulation();
         document.getElementById('skip-button').disabled = false;
+        document.getElementById('stop-button').disabled = true;
     };
 
     document.getElementById('play-button').addEventListener('click', togglePlaySimulation);
+    document.getElementById('stop-button').addEventListener('click', handleStopSimulation);
     document.getElementById('reset-button').addEventListener('click', resetSimulation);
 
     // graph button events
@@ -747,8 +761,6 @@ function main() {
     // set the initial values for the form inputs
     controlForm.querySelector('#advance-rate-value').value = advanceRateValue;
     controlForm.querySelector('#advance-rate-type').value = advanceRateType;
-    controlForm.querySelector('#do-end-condition').checked = doEndCondition;
-    toggleInputGroup(inputGroupEndCondition, doEndCondition);
     controlForm.querySelector('#end-condition-value').value = endConditionValue;
     controlForm.querySelector('#play-rate').value = playRate;
     controlForm.querySelector('#play-rate-output').value = playRate;
@@ -759,14 +771,6 @@ function main() {
 
     controlForm.querySelector('#advance-rate-type').addEventListener('change', (e) => {
         advanceRateType = e.target.value;
-    });
-
-    controlForm.querySelector('#do-end-condition').addEventListener('change', (e) => {
-        doEndCondition = e.target.checked;
-        toggleInputGroup(inputGroupEndCondition, doEndCondition);
-        // ensure the progress bar is reset while the simulation is running
-        updateProgressBar(controlPlayProgressBar, 0, endConditionValue);
-        runCount = 0;
     });
 
     controlForm.querySelector('#end-condition-value').addEventListener('input', (e) => {
