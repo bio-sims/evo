@@ -9,7 +9,7 @@
     <meta property="og:url" content="https://bio-sims.github.io/evo/wiki/">
     <meta property="theme-color" content="#a836ff">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=500, initial-scale=1">
     <!-- fonts and css -->
     <link rel="stylesheet" type="text/css" href="../css/style.css">
     <link rel="stylesheet" type="text/css" href="../css/wiki.css">
@@ -22,7 +22,8 @@
 <body>
     <nav class="wiki-nav">
         <ul class="nav-large">
-            <li>
+            <li class="logo">
+                <img src="../img/logo.svg" alt="Evo logo">
                 <h1>Evo</h1>
             </li>
             <li>
@@ -41,7 +42,10 @@
         </ul>
         <ul class="nav-small">
             <li>
-                <a class="nav-link" href="../">Evo</a>
+                <a class="nav-link logo" href="../">
+                    <img src="../img/logo.svg" alt="Evo logo">
+                    Evo
+                </a>
             </li>
             <li class="right-align">
                 <button class="svg-button" id="theme-toggle-small">
@@ -65,8 +69,9 @@
                 <ul>
                     <li><a class="wiki-link" href="#about">About Evo</a></li>
                     <li><a class="wiki-link" href="#controls">Controls</a></li>
-                    <li><a class="wiki-link" href="#config">Configuration</a></li>
                     <li><a class="wiki-link" href="#visualizaitons">Visualizations</a></li>
+                    <li><a class="wiki-link" href="#config">Configuration</a></li>
+                    <li><a class="wiki-link" href="#exporting-data">Exporting Data</a></li>
                     <li><a class="wiki-link" href="#advanced-config">Advanced Configuration</a></li>
                     <li><a class="wiki-link" href="#references">References</a></li>
                 </ul>
@@ -80,15 +85,15 @@
                 </section>
                 <section id="controls">
                     <h2>Controls</h2>
-                    <p>The simulation can be ran one advancement at a time or played back in real time. There are a few controls that you can use to interact with the simulation. Below is a list of the controls and their functions.</p>
+                    <p>The simulation can be played in multiple ways via timesteps, as there are a few different controls that you can use to interact with the simulation. Below is a list of the controls and their functions.</p>
                     <h3>Simulation Controls</h3>
                     <p>These controls are used to interact with the simulation itself.</p>
-                    <h4>Advance every</h4>
-                    <p>This controls the amount of time that will be simulated with each advancement, either through the advance button or the play button. The default value is 1 week and can be changed to use years or generations.</p>
-                    <h4>Stop playing after</h4>
-                    <p>Toggling this option on will stop the playback after a set amount of advances. For example, having an advancement rate of 1 year and a playback limit of 50 advances will run the simulation one year at a time until 50 years have passed from the given point in time. Disabling this option will cause the simulation to play infinitely until it is explicitly stopped by the user.</p>
+                    <h4>Timestep interval</h4>
+                    <p>This controls the amount of time that will be simulated with each step in the simulation. The default value is 1 year and can also be changed to use weeks or generations.</p>
+                    <h4>Max number of timesteps</h4>
+                    <p>The maximum number of timesteps dictates how many timesteps the simulation will produce after pressing play. If all the hares die before this maximum, the simulation will stop. For example: A timestemp interval of 1 year with 50 for maximum number of timesteps, the simulation will play until 50 years have been simulated or all hares have died.</p>
                     <h4>Playback speed</h4>
-                    <p>This controls the speed at which the simulation will play back in milliseconds. This ranges from <code>100ms</code> to <code>2500ms</code>.
+                    <p>This controls the speed at which the simulation will play back in milliseconds, i.e. the time between each timestep. This ranges from <code>100ms</code> to <code>2500ms</code>.
                     <table>
                         <thead>
                             <tr>
@@ -98,16 +103,16 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="nowrap">Advance</td>
-                                <td>Advances the simulation by the amount of time set in the "Advance every" control.</td>
-                            </tr>
-                            <tr>
-                                <td class="nowrap">Play/Stop</td>
-                                <td>Toggles playback of the simulation. Stopping early and starting again will consider the current point in time as the starting point.</td>
-                            </tr>
-                            <tr>
                                 <td class="nowrap">Reset</td>
                                 <td>Resets the simulation to the beginning of the current configuration.</td>
+                            </tr>
+                            <tr>
+                                <td class="nowrap">Play/Pause</td>
+                                <td>Toggles playback of the simulation. Pausing does not reset the number of timesteps that have been executed so far.</td>
+                            </tr>
+                            <tr>
+                                <td class="nowrap">Stop</td>
+                                <td>Stops playback and resets the number of timesteps that have passed.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -127,12 +132,12 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="nowrap">Toggle Area Chart</td>
+                                    <td class="nowrap">Area</td>
                                     <td>Toggles the graph between a line chart and an area chart.</td>
                                 </tr>
                                 <tr>
-                                    <td class="nowrap">Toggle Generation Ticks</td>
-                                    <td>Toggles the display of generation ticks on the x-axis rather than years/weeks</td>
+                                    <td class="nowrap">Ticks</td>
+                                    <td>Toggles the ticks on the x-axis between generations and years/weeks</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -183,7 +188,7 @@
                         <li><strong>Inner black outline, lowered opacity</strong>: The hare is dead.</li>
                     </ul>
                     <p>Once dead, a hare will no longer update, meaning hares that die while being mismatched will correctly display this information without considering the current environment. When a new generation begins, all dead hares are swept and replaced with the new ones.</p>
-                    <p>A weather bar displaying the current snow coverage and its associated color is provided for convenience at the bottom of the grid.</p>
+                    <p>A weather bar displaying the current snow coverage and its associated color is provided for convenience at the top of the grid.</p>
                     <h3>Snow Coverage Graph</h3>
                     <p>By default, the snow coverage graph displays the first week the simulation experiences snowless coverage in a year, with the y-axis representing the week of the year and the x-axis representing the year. The graph can be toggled to show the snow coverage for each week of the years which is available due to the simulations ability to work with more complicated climates than the defaults.</p>
                     <div class="flex-center">
@@ -196,7 +201,7 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="nowrap">Toggle Snow Data</td>
+                                    <td class="nowrap">Type</td>
                                     <td>Toggle between showing per-week snow coverage and first snowless week data</td>
                                 </tr>
                             </tbody>
@@ -257,6 +262,18 @@
                             </tbody>
                         </table>
                     </div>
+                </section>
+                <section id="exporting-data">
+                    <h2>Exporting Data</h2>
+                    <p>At any point in the simulation, you can export simulation data in various formats through the export button found at the bottom right corner of the charts. Downloading will export as a file automatically while new tab will open the data temporarily in a new tab, which does not persist after you've left the website.</p>
+                    <h3>PNG</h3>
+                    <p>The currently shown chart as a transparent PNG image. The colors will match the current theme of the website.</p>
+                    <h3>JPEG</h3>
+                    <p>The currently shown chart as a JPEG image with a solid colored background. The colors will match the current theme of the website.</p>
+                    <h3>JSON</h3>
+                    <p>All data related to the simulation in a JSON format. This includes the <code>configuration</code>, the <code>simulation</code> which also contains the currently alive hares, <code>alleleGraphDatasets</code>, <code>rawSnowData</code>, <code>rawFirstSnowlessWeekData</code>, and <code>rawPopulationData</code>. Any time related data is sorted in order and is on a per week basis with the exception of the <code>rawFirstSnowlessWeekData</code> which is on a per year basis.</p>
+                    <h3>CSV</h3>
+                    <p>Exports time-based simulation data as a CSV file. The first line is a header for the <code>Year</code>, <code>Week</code>, <code>Generation</code>, <code>Population Size</code>, <code>Snow Coverage</code>, and a column for each allele's frequency</p>
                 </section>
                 <section id="advanced-config">
                     <h2>Advanced Configuration</h2>
@@ -393,7 +410,7 @@
                                     <td>Every year, the first snowless day will fall within +/- 1 of a randomly chosen base week between 21 and 28. Snow coverage will only be 0% or 100%.</td>
                                 </tr>
                                 <tr>
-                                    <td class="nowrap">Integral Variable</td>
+                                    <td class="nowrap">Integral Warming</td>
                                     <td class="nowrap">IntegralWarmingClimate</td>
                                     <td>The first snowless day of the year drifts towards 0, slowing as it approaches it. Initial week starts around 30. Snow coverage will only be 0% or 100%.</td>
                                 </tr>
@@ -403,7 +420,7 @@
                                     <td>Similar to its integral counterpart, but snow coverage is decimal.</td>
                                 </tr>
                                 <tr>
-                                    <td class="nowrap">Realistic Variable</td>
+                                    <td class="nowrap">Realistic Warming</td>
                                     <td class="nowrap">RealisticWarmingClimate</td>
                                     <td>Snow coverage is decimal and drifts, on average, considerably slower than its integral counterpart.</td>
                                 </tr>
@@ -434,7 +451,7 @@
                 <section id="references">
                     <h2>References and Acknowledgements</h2>
                     <h3>Authors</h3>
-                    <p>This simulation's implementation was primarily developed and led by Zachary Mullen with additional input from Rena Ahn, Gina Philipose and mentorship under Dr. Nate Kremer-Herman of the Computer Science Department and Dr. Robert Rutherford. Dr. Rutherford primarily constructed the base requirements and concept of the simulation. Additionally, the simulation is an extended implementation of a previous implementation authored by Dr. Rutherford, Jeremy Bjeljac, Sam Levy, Richard Charczenko, Madeline McMahon of the Seattle University Biology Department.
+                    <p>This simulation's implementation was primarily developed and led by Zachary Mullen with additional input from Rena Ahn, Gina Philipose and mentorship under Dr. Nate Kremer-Herman of the Computer Science Department and Dr. Robert Rutherford. Dr. Rutherford primarily constructed the base requirements and concept of the simulation. Additionally, the simulation is an extended implementation of a previous implementation authored by Dr. Rutherford, Jeremy Bjeljac, Sam Levy, Richard Charczenko, Madeline McMahon of the Seattle University Biology Department. Accompanying materials and design feeback in regards to the accuracy and learning potential of the simulation were provided by Amanda Nouwens and Margaret Fitzgibbon.</p>
                     <h3>Citations</h3>
                     <p>Zimova, M., Mills, L.S. and Nowak, J.J. (2016), High fitness costs of climate change-induced camouflage mismatch. Ecol Lett, 19: 299-307. <a href="https://doi.org/10.1111/ele.12568">https://doi.org/10.1111/ele.12568</a></p>
                 </section>

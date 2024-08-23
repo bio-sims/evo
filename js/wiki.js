@@ -6,10 +6,18 @@ function main() {
 
     // open/close nav
     navHamburger.addEventListener('click', () => {
+        const handleOutsideClick = (event) => {
+            if (!headerContents.contains(event.target) && !navHamburger.contains(event.target)) {
+                headerContents.setAttribute('data-closed', '');
+                document.removeEventListener('click', handleOutsideClick);
+            }
+        };
         if (headerContents.attributes['data-closed'] !== undefined) {
             headerContents.removeAttribute('data-closed');
+            document.addEventListener('click', handleOutsideClick);
         } else {
             headerContents.setAttribute('data-closed', '');
+            document.removeEventListener('click', handleOutsideClick);
         }
     });
 

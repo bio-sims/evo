@@ -860,18 +860,14 @@ function main() {
     // --- dropdown events ---
     const exportAlleleChart = document.getElementById('export-allele-chart');
     const exportSnowChart = document.getElementById('export-snow-chart');
-    const chartToJSON = (chart) => {
+    const simToJSON = (chart) => {
         const data = {
-            labels: chart.data.labels,
-            datasets: chart.data.datasets.map((dataset) => {
-                return {
-                    label: dataset.label,
-                    data: dataset.data,
-                    borderColor: dataset.borderColor,
-                    backgroundColor: dataset.backgroundColor,
-                    fill: dataset.fill,
-                };
-            }),
+            configuration: currentConfig,
+            simulation: simulation,
+            alleleGraphDatasets: alleleGraphDatasets,
+            rawSnowData: rawSnowData,
+            rawFirstSnowlessWeekData: rawFirstSnowlessWeekData,
+            rawPopulationData: rawPopulationData,
         };
         return JSON.stringify(data);
     }
@@ -962,7 +958,7 @@ function main() {
         {
             text: "Download JSON",
             callback: () => {
-                const json = chartToJSON(getChart());
+                const json = simToJSON();
                 const blob = new Blob([json], { type: 'application/json' });
                 downloadData(URL.createObjectURL(blob), `${chartName}-${Date.now()}.json`);
             },
@@ -997,7 +993,7 @@ function main() {
             text: "JSON in New Tab",
             link: true,
             callback: () => {
-                const json = chartToJSON(getChart());
+                const json = simToJSON();
                 const blob = new Blob([json], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 window.open(url, '_blank');
