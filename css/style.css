@@ -155,7 +155,7 @@ nav > ul > li {
     height: 100%;
 }
 
-nav > ul > li.logo {
+.logo {
     display: flex;
     justify-content: center;
     gap: 0.75rem;

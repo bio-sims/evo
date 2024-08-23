@@ -246,27 +246,33 @@ article.wiki-content-container {
     flex-grow: 4;
 }
 
+a.wiki-link:hover {
+    color: var(--cr-text-primary-faded);
+}
+
 @media (width < 1000px) {
     nav.wiki-nav {
-        position: relative;
+        position: sticky;
+        top: 0;
+        background-color: var(--cr-bg-primary);
     }
     #header-contents {
         box-sizing: content-box;
-        position: absolute;
+        position: fixed;
         top: var(--nav-height);
         left: 0;
         right: 0;
         z-index: 1000;
-        padding: 1rem;
-        max-height: 100vh;
+        padding: 2rem;
+        margin: 0 0.5rem;
+        max-height: 100%;
         overflow: hidden;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         opacity: 1;
-        transition: max-height 0.75s ease-in;
+        transition: opacity 0.25s ease-in;
     }
     #header-contents[data-closed] {
-        border: none;
-        max-height: 0;
+        pointer-events: none;
         opacity: 0;
     }
     button.svg-button svg {
