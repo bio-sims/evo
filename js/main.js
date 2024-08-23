@@ -569,9 +569,10 @@ function main() {
     const presetElement = document.createElement('div');
     presetElement.classList.add('preset-entry');
     presetElement.innerHTML = `
-        <h3 class="preset-name"></h3>
+        <label class="preset-name"></label>
         <p class="preset-description"></p>
     `;
+    presetElement.tabIndex = 0;
     // add all presets to the div
     const presetsContainer = document.getElementById('preset-container');
     for (let i = 0; i < scenarios.length; i++) {
@@ -579,7 +580,7 @@ function main() {
         const presetClone = presetElement.cloneNode(true);
         presetClone.querySelector('.preset-name').textContent = preset.name;
         presetClone.querySelector('.preset-description').textContent = preset.description;
-        presetClone.addEventListener('click', () => {
+        const handleSelectPreset = (e) => {
             // remove --selected from all presets
             for (const preset of presetsContainer.children) {
                 preset.classList.remove('preset-entry--selected');
@@ -590,6 +591,12 @@ function main() {
             // hide apply message in case it was shown before
             document.getElementById('config-form-apply-msg').classList.add('hidden');
             updateScenario();
+        };
+        presetClone.addEventListener('click', handleSelectPreset);
+        presetClone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                handleSelectPreset(e);
+            }
         });
         if (i === selectedScenarioIndex) {
             presetClone.classList.add('preset-entry--selected');

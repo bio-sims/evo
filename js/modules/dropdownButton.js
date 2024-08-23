@@ -29,6 +29,8 @@ export default class DropdownButton {
             const button = document.createElement("button");
             button.classList.add("icon-button");
             button.innerHTML = item.text;
+            // initial set tab index to -1 to prevent tabbing to hidden elements
+            button.setAttribute("tabindex", "-1");
 
             // add icon to button
             const launchSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -76,6 +78,14 @@ export default class DropdownButton {
                 this.dropdown.style.right = "0";
             }
             this.dropdown.classList.toggle("show", this.isOpen);
+        }
+        // set tab index to 0 for visible elements
+        if (this.isOpen) {
+            this.dropdown.querySelectorAll("button").forEach((button) => button.setAttribute("tabindex", "0"));
+            this.dropdown.querySelector("button").focus();
+        } else {
+            this.dropdown.querySelectorAll("button").forEach((button) => button.setAttribute("tabindex", "-1"));
+            this.button.focus();
         }
     }
 }

@@ -29,6 +29,20 @@ function main() {
         });
     }
 
+    // when highlighted with tab when nav is closed, open nav
+    headerContents.addEventListener('focusin', () => {
+        if (headerContents.attributes['data-closed'] !== undefined) {
+            navHamburger.click();
+        }
+    });
+
+    // when tab leaves nav, close nav
+    headerContents.addEventListener('focusout', () => {
+        if (headerContents.attributes['data-closed'] === undefined) {
+            navHamburger.click();
+        }
+    });
+
     const handleToggleTheme = () => {
         toggleTheme();
         const themeIconSmall = document.getElementById('theme-icon-path-small');

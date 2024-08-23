@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="dark">
+<html data-theme="dark" lang="en">
 <head>
     <title>Wiki | Evo</title>
     <meta property="og:title" content="Wiki | Evo">
@@ -17,13 +17,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <!-- scripts -->
-    <script type="module" src="../js/wiki.js" defer></script>
+    <script type="module" src="../js/wiki.js"></script>
 </head>
 <body>
     <nav class="wiki-nav">
         <ul class="nav-large">
             <li class="logo">
-                <img src="../img/logo.svg" alt="Evo logo">
+                <img src="../img/logo.svg" alt="Evo logo" width="32" height="32">
                 <h1>Evo</h1>
             </li>
             <li>
@@ -33,7 +33,7 @@
                 <a class="nav-link" href="./">Wiki</a>
             </li>
             <li class="right-align">
-                <button class="svg-button" id="theme-toggle-large">
+                <button class="svg-button" id="theme-toggle-large" aria-label="Toggle color theme">
                     <svg viewBox="0 0 24 24">
                         <path id="theme-icon-path-large" d="" stroke-width="0.1" stroke="currentColor" fill="currentColor"></path>
                     </svg>
@@ -43,17 +43,17 @@
         <ul class="nav-small">
             <li>
                 <a class="nav-link logo" href="../">
-                    <img src="../img/logo.svg" alt="Evo logo">
+                    <img src="../img/logo.svg" alt="Evo logo" width="32" height="32">
                     Evo
                 </a>
             </li>
             <li class="right-align">
-                <button class="svg-button" id="theme-toggle-small">
+                <button class="svg-button" id="theme-toggle-small" aria-label="Toggle color theme">
                     <svg viewBox="0 0 24 24">
                         <path id="theme-icon-path-small" d="" stroke-width="0.1" stroke="currentColor" fill="currentColor"></path>
                     </svg>
                 </button>
-                <button class="svg-button nav-toggle" id="nav-toggle">
+                <button class="svg-button nav-toggle" id="nav-toggle" aria-label="Toggle navigation panel">
                     <svg viewBox="0 0 24 24">
                         <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" fill="currentColor"></path>
                     </svg>
@@ -78,7 +78,7 @@
             </section>
             <article class="wiki-content-container wiki-card">
                 <section id="about">
-                    <h1>About Evo</h1>
+                    <h2>About Evo</h2>
                     <p>Welcome to the population genetics simulation known as Evo. This simulation is designed to help you further understand population genetics and how underlying forces such as natural selection and climate stability play a role in varying populations. This simulation was inspired by field work done on snowshoe hares in Montana. These animals were found to have genes that cause them to seasonally change from white to brown to match the color of the ground as snow melts. Field researchers found that for each week a hare&apos;s coat mismatched it&apos;s environment, it was 7% less likely to survive natural selection due to predation (e.g. owls and foxes). These are the default values used in the simulation but can be modified for the sake of experimentation.</p>
                     <p>To help us understand population genetics, this simulation by default starts with a hypothetical population containing 4 equally abundant alleles (A.wk.15, A.wk.24, A.wk.26, A.wk.35). The number in each allele indicates the week of the year a homozygote will switch its coat from white to brown.</p>
                     <p>There are six separate simulations each one focusing on variances in size of population, stability of the climate or the presence of natural selection. Each simulation tracks the hypothetical population of hares and their four alleles as they evolve over time. Any changes to the variables mentioned above, can have an impact on the evolution of the population of hares. When running the simulation you&apos;ll find a graph presenting the change of allele frequencies over time and a graph presenting the change in the week of snow melt for each year in the simulation. There is also a grid which has a box element for each hare with their current state in the given week of the simulation. Use both of these graphs to analyze trends and look at any underlying forces producing the allele frequencies you see. Just like in the biosphere, chance events like random mating and the success of individual animals will play a role in how these simulated populations evolve. Feel free to run each simulation as many times as you want to better understand these things.</p>
@@ -206,9 +206,10 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
                 </section>
                 <section id="config">
-                    <h2 id="config">Configuration</h2>
+                    <h2>Configuration</h2>
                     <p>Even though here are default preset values for the simulation, you can also modify them yourself. Below is a explanation of each of the variables you can modify from the configuration panel.</p>
                     <div class="flex-center">
                         <table>
@@ -278,7 +279,7 @@
                 <section id="advanced-config">
                     <h2>Advanced Configuration</h2>
                     <p>If you have chosen to run this simulation locally, you may have noticed the <code>sim.config.js</code> file. This has been explained in the README, but here are its specifications.</p>
-                    <h4>alleleSets</h4>
+                    <h3>alleleSets</h3>
                     <p>This is an array containing sets of allele objects. The name of the set can be referenced in presets/scenarios. Each allele should have the following properties, though a question mark indicates that the property is optional:</p>
                     <div class="flex-center">
                         <table>
@@ -332,7 +333,7 @@
                                 </tr>
                         </table>
                     </div>
-                    <h4>scenarios</h4>
+                    <h3>scenarios</h3>
                     <p>This is an array containing sets of scenario objects. These will be displayed in the preset panel of the simulation. The scenario should have a <code>name</code>, <code>description</code>, and <code>options</code> object. The <code>options</code> object should contain the following properties, though a question mark indicates that the property is optional:</p>
                     <div class="flex-center">
                         <table>
@@ -392,7 +393,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <h5 id="climate-functions">Climate Functions</h5>
+                    <h4 id="climate-functions">Climate Functions</h4>
                     <p>Climate functions are used to determine the snow coverage for each week of the year. Below are the available climate functions and their descriptions.</p>
                     <div class="flex-center">
                         <table>
@@ -427,7 +428,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <h5 id="generation-functions">Generation Functions</h5>
+                    <h4 id="generation-functions">Generation Functions</h4>
                     <p>Generation functions are used to determine when the population will repopulate. Below are the available generation functions and their descriptions.</p>
                     <div class="flex-center">
                         <table>
