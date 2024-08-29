@@ -29,7 +29,7 @@ ul.nav-small button {
     color: inherit;
 }
 
-ul.nav-small a.nav-link:first-child {
+a.nav-link.logo {
     font-size: 1.5rem;
     font-weight: bold;
 }
@@ -74,7 +74,7 @@ div.wiki-page h5 {
     margin-bottom: 0.25rem;
 }
 
-div.wiki-page h1, h2 {
+div.wiki-page h1, div.wiki-page h2 {
     border-bottom: 1px solid var(--cr-border-primary);
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
